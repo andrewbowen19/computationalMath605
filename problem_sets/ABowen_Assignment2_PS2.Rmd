@@ -1,0 +1,89 @@
+---
+title: "DATA605 Homework 2"
+author: "Andrew Bowen"
+date: "2023-02-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+## A = LU Factorization
+First, let's define our function(s) to factorize a given square matrix A into lower and upper triangular matrices: [$A= LU$](https://en.wikipedia.org/wiki/LU_decomposition):
+
+```{r}
+# create test 3x3 matrix
+sample_matrix <- matrix(data=c(1,2,3,4,5,6,7,8,9), nrow=3, ncol=3)
+```
+
+```{r factorization-function}
+
+get_multiplier <- function(r_i, r_j){
+  # Gets multiplier that cancels out r_j: r_j - k * r_i = 0
+   r_j / r_i
+}
+
+baseL <- function(N){
+  # Returns "base" lower-triangular matrix: L
+  L <- matrix(data=NA, nrow=N, ncol=N)
+  # setting diagonal vals to 1 and upper triangular vals to 0
+  for (i in seq(N)){
+    for (j in seq(N))
+      # Set diagonal vals to 1
+      if (i == j){
+        L[i, j] = 1
+      }
+      # Set lower triangular vals to 0
+      else if( j > i){
+        L[i, j] = 0
+      }
+  }
+}
+
+baseU <- function(N){
+  # Returns "base" upper-triangular matrix: U
+  U <- matrix(data=NA, nrow=N, ncol=N)
+  # setting diagonal vals to 1 and upper triangular vals to 0
+  for (i in seq(N)){
+    for (j in seq(N))
+      # Set diagonal vals to 1
+      if (i == j){
+        U[i, j] = 1
+      }
+      # Set lower triangular vals to 0
+      else if(i > j){
+        U[i, j] = 0
+      }
+  }
+  
+}
+
+lu_factorization <- function(A){
+  # A is square, so n x n by definition
+  n <- nrow(A)
+  L <- baseL(n)
+  U <- baseU(n)
+  multipliers <- c() # instantiate vector to track multipliers
+  for (i in seq(n)){
+    if (i != n){ # skip if terminal row
+      working_row = A[i, ]
+      next_row = A[i + 1, ]
+      k <- get_multiplier(working_row[1], next_row[1])
+      print(k)
+      append(multipliers, k, after=length(multipliers))
+    }
+    
+    
+  }
+  print(multipliers)
+  
+}
+
+lu_factorization(sample_matrix)
+```
+
