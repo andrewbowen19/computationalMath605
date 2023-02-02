@@ -39,7 +39,7 @@ baseL <- function(N){
         L[i, j] = 1
       }
       # Set lower triangular vals to 0
-      else if( j > i){
+      else if(j > i){
         L[i, j] = 0
       }
   }
@@ -77,19 +77,22 @@ lu_factorization <- function(A){
   U[1, ] = A[1, ]
   
   for (i in seq(n)){
-    if (i != n){ # skip if terminal row
-      working_row = A[i, ]
-      next_row = A[i + 1, ]
+    # if (i != n){ # skip if terminal row
+      # working_row = A[i, ]
+      # next_row = A[i + 1, ]
       
       for (j in seq(n)){
         if (j < i){
-          k <- get_multiplier(working_row[j], next_row[j])
+          k <- get_multiplier(A[i, j], A[j, j])
           L[i, j] = k
+          
+          # TODO: figure out accessing the multiplier for row operations to construct U
+          # Subtract the jth row from the i + 1th row (keep i as main index)
+          U[i, ] = A[i, ] - k * A[j, ]
         }
       }
-      # TODO: figure out accessing the multiplier for row operations to construct U
-      U[i + 1, ] = next_row - L[i,] * working_row
-    }
+
+    # }
     
   
   }
@@ -100,3 +103,8 @@ lu_factorization <- function(A){
 lu_factorization(sample_matrix)
 ```
 
+```{r}
+test_matrix <- matrix(data=c(2, 2, 3, 5, 9, 10, 4, 1, 2), nrow=3, ncol=3)
+
+lu_factorization(test_matrix)
+```
