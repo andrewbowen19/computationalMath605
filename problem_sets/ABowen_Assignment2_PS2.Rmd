@@ -21,8 +21,8 @@ First, let's define our function(s) to factorize a given square matrix A into lo
 sample_matrix <- matrix(data=c(1,2,3,4,5,6,7,8,9), nrow=3, ncol=3)
 ```
 
-```{r factorization-function}
-
+Adding some helper functions that will be called in `lu_factorization`
+```{r}
 get_multiplier <- function(r_i, r_j){
   # Gets multiplier that cancels out r_j: r_j - k * r_i = 0
    r_j / r_i
@@ -43,6 +43,7 @@ baseL <- function(N){
         L[i, j] = 0
       }
   }
+  return(L)
 }
 
 baseU <- function(N){
@@ -60,28 +61,40 @@ baseU <- function(N){
         U[i, j] = 0
       }
   }
-  
+  return(U)
 }
+```
+
+```{r factorization-function}
 
 lu_factorization <- function(A){
   # A is square, so n x n by definition
   n <- nrow(A)
   L <- baseL(n)
   U <- baseU(n)
-  multipliers <- c() # instantiate vector to track multipliers
+  
+  # we can take the top row of A to be the top row of U as well
+  U[1, ] = A[1, ]
+  
   for (i in seq(n)){
     if (i != n){ # skip if terminal row
       working_row = A[i, ]
       next_row = A[i + 1, ]
-      k <- get_multiplier(working_row[1], next_row[1])
-      print(k)
-      append(multipliers, k, after=length(multipliers))
+      
+      for (j in seq(n)){
+        if (j < i){
+          k <- get_multiplier(working_row[j], next_row[j])
+          L[i, j] = k
+        }
+      }
+      # TODO: figure out accessing the multiplier for row operations to construct U
+      U[i + 1, ] = next_row - L[i,] * working_row
     }
     
-    
-  }
-  print(multipliers)
   
+  }
+  print(L)
+  print(U)
 }
 
 lu_factorization(sample_matrix)
