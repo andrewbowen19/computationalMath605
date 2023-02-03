@@ -77,29 +77,30 @@ lu_factorization <- function(A){
   U[1, ] = A[1, ]
   
   for (i in seq(n)){
-    # if (i != n){ # skip if terminal row
-      # working_row = A[i, ]
-      # next_row = A[i + 1, ]
-      
+    if (i > 1) {
+      print(i)
       for (j in seq(n)){
-        if (j < i){
-          k <- get_multiplier(A[i, j], A[j, j])
+        if (j < i && j != 0){
+          print(j)
+          print("Foo")
+          k <- get_multiplier(A[i-1, j], A[i, j])
           L[i, j] = k
           
           # TODO: figure out accessing the multiplier for row operations to construct U
           # Subtract the jth row from the i + 1th row (keep i as main index)
-          U[i, ] = A[i, ] - k * A[j, ]
+          print(U[i, ])
+          print(k)
+          U[i, ] = A[i, ] - k * A[i-1, ]
+          
         }
+        
       }
-
-    # }
-    
-  
+    }
   }
   print(L)
   print(U)
 }
-
+sample_matrix_2x2 <-matrix(c(1,2,3,4), nrow=2, ncol=2)
 lu_factorization(sample_matrix)
 ```
 
