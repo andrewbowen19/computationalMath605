@@ -9,9 +9,56 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Problem Set 1
+
+1. *Prove that $A^TA \ne AA^T$ in general*.   
+Assume $A$ is an $m x n$ matrix, with $m \in \mathbb{R}$ and $n \in \mathbb{R}$. Let's also assum $m \ne n$. Since A is $m x n$, $A^T$ is then $n x m$. If we just compare dimensions when we multiply each term of the equation, we see that each side could result in differing dimensions. 
+
+$$
+\begin{align}
+_{(m x n)}AA^T_{(nxm)} = B_{(m x m)}
+\end{align}
+$$
 
 
+$$
+\begin{align}
+_{(n x m)}A^TA_{(mxn)} = C_{(n x n)}
+\end{align}
+$$
+The subscripts in parentheses above denote the dimensions of the corresponding matrices.Because $C$ is $n x n$, and $B$ is $m x m$, and $m$ is not necessarily equal to $n$, then $B \ne C$ and $AA^T \ne A^TA$.
 
+
+2. *For a special type of square matrix A, we get $A^T A = AA^T$ . Under what conditions
+could this be true? (Hint: The Identity matrix I is an example of such a matrix).*
+
+To solve this, let's take an (educated) guess that $A$ is diagonal, which would include the identity matrix $\mathbb{I}$. Then, we can check our assumption and tha $A$ meets the condition
+
+A diagonal matrix $A$ takes the form:
+
+
+\begin{align}
+A = \begin{bmatrix} 
+    a_{11} & 0 & \dots \\
+    \vdots & \ddots & \\
+    0 &             & a_{KK} 
+    \end{bmatrix}
+
+\end{align}
+
+
+with $a_{ii} \ne 0$ and $a_{ij} = 0$ when $i \ne j$. In simpler terms, only the diagonal terms of the matrix are non-zero. When this is the case, $A = A^T$ and we can rewrite the original equation substituting $A$ for $A^T$: 
+
+
+\begin{align}
+  AA^T = AA = A^2
+\end{align}
+
+\begin{align}
+  A^TA = AA = A^2
+\end{align}
+
+Since both sides of the equation are equal to $A^2$, they are equal to each other.
 
 ## A = LU Factorization
 First, let's define our function(s) to factorize a given square matrix A into lower and upper triangular matrices: [$A= LU$](https://en.wikipedia.org/wiki/LU_decomposition):
@@ -75,37 +122,40 @@ lu_factorization <- function(A){
   
   # we can take the top row of A to be the top row of U as well
   U[1, ] = A[1, ]
+  # U <- A
   
   for (i in seq(n)){
-    if (i > 1) {
-      print(i)
+    if (i > 1) { # skip first row in matrix
+      
       for (j in seq(n)){
-        if (j < i && j != 0){
-          print(j)
-          print("Foo")
-          k <- get_multiplier(A[i-1, j], A[i, j])
-          L[i, j] = k
+        if (j < i){
+ 
+          multipllier <- A[i, j] / A[i-1, j]
+          L[i, j] = multipllier
           
           # TODO: figure out accessing the multiplier for row operations to construct U
           # Subtract the jth row from the i + 1th row (keep i as main index)
-          print(U[i, ])
-          print(k)
-          U[i, ] = A[i, ] - k * A[i-1, ]
+
+          U[i, ] = A[i, ] - multipllier * A[i-1, ]
           
         }
         
       }
     }
   }
-  print(L)
-  print(U)
+  return(list(L, U))
 }
-sample_matrix_2x2 <-matrix(c(1,2,3,4), nrow=2, ncol=2)
-lu_factorization(sample_matrix)
+result <- lu_factorization(sample_matrix)
+L <- result[[1]]
+U <- result[[2]]
+
+print(L)
+
+print(U)
+
+
+print(L %*% U)
 ```
 
-```{r}
-test_matrix <- matrix(data=c(2, 2, 3, 5, 9, 10, 4, 1, 2), nrow=3, ncol=3)
 
-lu_factorization(test_matrix)
-```
+
