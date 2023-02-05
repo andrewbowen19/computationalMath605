@@ -363,7 +363,6 @@ display: none;
 </div>
 
 
-<pre class="r"><code>library(glue)</code></pre>
 <div id="problem-set-1" class="section level2">
 <h2>Problem Set 1</h2>
 <ol style="list-style-type: decimal">
@@ -414,7 +413,8 @@ equation substituting <span class="math inline">\(A\)</span> for <span class="ma
 <p><span class="math display">\[\begin{align}
   A^TA = AA = A^2
 \end{align}\]</span></p>
-<p>Since both sides of the equation are equal to <span class="math inline">\(A^2\)</span>, they are equal to each other.</p>
+<p>Since both sides of the equation are equal to <span class="math inline">\(A^2\)</span>, they are equal to each other, and
+<span class="math inline">\(AA^T = A^TA\)</span> in the case that <span class="math inline">\(A\)</span> is a diagonal matrix.</p>
 </div>
 <div id="a-lu-factorization" class="section level2">
 <h2><code>A = LU</code> Factorization</h2>
@@ -429,14 +429,14 @@ multipliers” below the diagonal.</p>
 <pre class="r"><code>baseL &lt;- function(N){
   # Returns &quot;base&quot; lower-triangular matrix: L
   L &lt;- matrix(data=NA, nrow=N, ncol=N)
-  # setting diagonal vals to 1 and upper triangular vals to 0
+  # setting diagonal vals to 1 and other vals to 0
   for (i in seq(N)){
     for (j in seq(N))
       # Set diagonal vals to 1
       if (i == j){
         L[i, j] = 1
       }
-      # Set lower triangular vals to 0
+      # Set other vals to 0
       else{
         L[i, j] = 0
       }
@@ -464,7 +464,7 @@ given matrix</p>
           # Set L in proper position to have multiplier (below diagonal)
           L[i, j] = multiplier
           
-          # Perform roq reduction on U
+          # Perform row reduction on U
           U[i, ] = U[i, ] - L[i,j] * U[j, ]
         }
       }
@@ -478,6 +478,7 @@ result &lt;- lu_factorization(sample_matrix)
 L &lt;- result[[1]]
 U &lt;- result[[2]]
 
+# print out our results
 print(L)</code></pre>
 <pre><code>##      [,1] [,2] [,3]
 ## [1,]    1  0.0    0
