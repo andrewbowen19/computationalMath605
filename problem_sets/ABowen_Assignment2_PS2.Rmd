@@ -69,16 +69,11 @@ First, let's define our function(s) to factorize a given square matrix A into lo
 
 ```{r}
 # create test 3x3 matrix
-sample_matrix <- matrix(data=c(1,2,3,4,5,6,7,8,9), nrow=3, ncol=3)
+sample_matrix <- matrix(data=c(1,2,3,5,5,6,7,8,9), nrow=3, ncol=3)
 ```
 
-Adding some helper functions that will be called in `lu_factorization`
+Adding a helper functions that will be called in `lu_factorization` to construct the initial $L$ for any beginning matrix size $n$. $L$ starts as the identity matrix then becomes populated with "row multipliers" below the diagonal.
 ```{r}
-get_multiplier <- function(r_i, r_j){
-  # Gets multiplier that cancels out r_j: r_j - k * r_i = 0
-   r_j / r_i
-}
-
 baseL <- function(N){
   # Returns "base" lower-triangular matrix: L
   L <- matrix(data=NA, nrow=N, ncol=N)
@@ -97,46 +92,34 @@ baseL <- function(N){
   return(L)
 }
 
-baseU <- function(N){
-  # Returns "base" upper-triangular matrix: U
-  U <- matrix(data=NA, nrow=N, ncol=N)
-  # setting diagonal vals to 1 and upper triangular vals to 0
-  for (i in seq(N)){
-    for (j in seq(N)){
-
-        U[i, j] = 0
-      }
-  }
-  return(U)
-}
 ```
 
+
+Now, let's write out our function to perform LU decomposition of a given matrix
 ```{r factorization-function}
 
 lu_factorization <- function(A){
   # A is square, so n x n by definition
   n <- nrow(A)
   L <- baseL(n)
-  U <- matrix(, nrow = n, ncol = n)
 
-  # First row of U matches A
+  # We will derive U from A, so let's set them as equal to start
   U <- A
   # First, iterate over rows
   for (i in 1:n){
-    if (i > 1) { # skip first row in matrix
+    if (i > 1) { # skip first row in matrix - we won't need to row-reduce it!
       
+      # nowmiterate over column vals
       for (j in 1:n){
-        if (j < i){
- 
-          multiplier <- A[i, j] / A[i-1, j]
+        multiplier <- U[i, j] / U[j, j]
+        if (j < i){ # only need to operate/row-reduce on index pairs below the diagonal
+          
+          # Set L in proper position to have multiplier (below diagonal)
           L[i, j] = multiplier
           
-          # TODO: figure out accessing the multiplier for row operations to construct U
-          # Subtract the jth row from the i + 1th row (keep i as main index)
-          U[i, ] = A[i, ] - multiplier * A[i-1, ]
-          
+          # Perform roq reduction on U
+          U[i, ] = U[i, ] - L[i,j] * U[j, ]
         }
-        
       }
     }
   }
@@ -154,5 +137,19 @@ print(U)
 print(L %*% U)
 ```
 
+```{r test-4-x-4}
+# Testing out above LU function on sample 4x4 matrix
+matrix4x4 <- matrix(c(2,3,1,5,7,2,3,4,1,0,5,4,3,3,4,5), nrow=4, ncol=4)
+
+result4 <- lu_factorization(matrix4x4)
+
+L4 <- result4[[1]]
+U4 <- result4[[2]]
+
+print(L4)
+print(U4)
+
+print(L4 %*% U4)
+```
 
 
