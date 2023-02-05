@@ -363,6 +363,7 @@ display: none;
 </div>
 
 
+<pre class="r"><code>library(glue)</code></pre>
 <div id="problem-set-1" class="section level2">
 <h2>Problem Set 1</h2>
 <ol style="list-style-type: decimal">
@@ -416,7 +417,7 @@ equation substituting <span class="math inline">\(A\)</span> for <span class="ma
 <p>Since both sides of the equation are equal to <span class="math inline">\(A^2\)</span>, they are equal to each other.</p>
 </div>
 <div id="a-lu-factorization" class="section level2">
-<h2>A = LU Factorization</h2>
+<h2><code>A = LU</code> Factorization</h2>
 <p>First, let’s define our function(s) to factorize a given square
 matrix A into lower and upper triangular matrices: <a href="https://en.wikipedia.org/wiki/LU_decomposition"><span class="math inline">\(A= LU\)</span></a>:</p>
 <pre class="r"><code># create test 3x3 matrix
@@ -439,7 +440,7 @@ baseL &lt;- function(N){
         L[i, j] = 1
       }
       # Set lower triangular vals to 0
-      else if(j &gt; i){
+      else{
         L[i, j] = 0
       }
   }
@@ -451,13 +452,8 @@ baseU &lt;- function(N){
   U &lt;- matrix(data=NA, nrow=N, ncol=N)
   # setting diagonal vals to 1 and upper triangular vals to 0
   for (i in seq(N)){
-    for (j in seq(N))
-      # Set diagonal vals to 1
-      if (i == j){
-        U[i, j] = 1
-      }
-      # Set lower triangular vals to 0
-      else if(i &gt; j){
+    for (j in seq(N)){
+
         U[i, j] = 0
       }
   }
@@ -467,25 +463,23 @@ baseU &lt;- function(N){
   # A is square, so n x n by definition
   n &lt;- nrow(A)
   L &lt;- baseL(n)
-  U &lt;- baseU(n)
-  
-  # we can take the top row of A to be the top row of U as well
-  U[1, ] = A[1, ]
-  # U &lt;- A
-  
-  for (i in seq(n)){
+  U &lt;- matrix(, nrow = n, ncol = n)
+
+  # First row of U matches A
+  U &lt;- A
+  # First, iterate over rows
+  for (i in 1:n){
     if (i &gt; 1) { # skip first row in matrix
       
-      for (j in seq(n)){
+      for (j in 1:n){
         if (j &lt; i){
  
-          multipllier &lt;- A[i, j] / A[i-1, j]
-          L[i, j] = multipllier
+          multiplier &lt;- A[i, j] / A[i-1, j]
+          L[i, j] = multiplier
           
           # TODO: figure out accessing the multiplier for row operations to construct U
           # Subtract the jth row from the i + 1th row (keep i as main index)
-
-          U[i, ] = A[i, ] - multipllier * A[i-1, ]
+          U[i, ] = A[i, ] - multiplier * A[i-1, ]
           
         }
         
@@ -494,6 +488,8 @@ baseU &lt;- function(N){
   }
   return(list(L, U))
 }
+
+# Sample test call of function
 result &lt;- lu_factorization(sample_matrix)
 L &lt;- result[[1]]
 U &lt;- result[[2]]

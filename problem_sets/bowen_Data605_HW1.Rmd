@@ -1,0 +1,149 @@
+---
+title: "DATA 605 HW1"
+author: "Andrew Bowen"
+date: "2023-01-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r sample-code}
+x=c(rep(0,500),seq(0,1,length.out=1000), rep(1,500))
+y=c(seq(-1,1,length.out=500),rep(0,1000), seq(-1,1,length.out=500))
+z=rbind(x,y)
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+```
+
+First, let's construct an image of my initials (AB)
+```{r}
+# Each rep in x needs to have a corresponding seq in y (and vice versa)
+x=c(# B lines
+    rep(0,500),
+    seq(0,1,length.out=500),
+    rep(1,500),
+    seq(0,1,length.out=500),
+    seq(0,1,length.out=500),
+    
+    
+    # A lines
+    seq(-1.5, -0.5, length.out = 500),
+    rep(-1.5, 500),
+    rep(-0.5, 500),
+    seq(-1.5, -0.5, length.out = 500)
+    
+    )
+y=c(# B lines
+    seq(-1,1,length.out=500),
+    rep(0,500),
+    seq(-1,1,length.out=500),
+    rep(1,500),
+    rep(-1,500),
+    
+    
+    # A lines
+    rep(0,500),
+    seq(-1,1, length.out = 500),
+    seq(-1,1, length.out = 500),
+    rep(1, 500)
+    
+    
+    )
+z=rbind(x,y)
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+
+```
+Looks like we wera able to plot initials. Now let's get to some matrix transforms!
+
+First, let's use the built-in `diag` function to construct an identity matrix of whichever dimension we want ($n x n$)
+```{r}
+matrix <- diag(2)
+
+matrix
+```
+
+## Shear
+
+In a [shear matrix](https://en.wikipedia.org/wiki/Shear_matrix), the off-diagonal values determine the amount of shear
+
+
+```{r, y-shear}
+# Create plotting window. XQuartz needs to be installed locally for this to work
+x11()
+
+# Plotting y-shear in loop
+for (i in seq(-3,3, length.out=100)){
+  # Update the identity matrix to have the shear coefficient in the off-diagonal position
+  # For shear in the y-plane, this comes under the diagonal (row 2 col 1)
+  matrix[2,1] = i
+  # Apply matrix multiplication to z vector and plot results
+  sheared_matrix <- apply(z, 2, function(x) matrix %*% x)
+  plot(sheared_matrix[2,] ~ sheared_matrix[1,])
+}
+```
+
+```{r x-shear}
+x11()
+
+matrix <- diag(2)
+# Plotting x-shear in loop
+# Only thing that differs is indices when adjusting shear matrix
+for (i in seq(-3,3, length.out=100)){
+  # Update the identity matrix to have the shear coefficient in the off-diagonal position
+  # For shear in the y-plane, this comes under the diagonal (row 2 col 1)
+  matrix[1,2] = i
+  
+  # Apply matrix multiplication to entire z vector and plot results
+  sheared_matrix <- apply(z, 2, function(x) matrix %*% x)
+  plot(sheared_matrix[2,] ~ sheared_matrix[1,])
+}
+```
+
+
+## Scaling
+For scaling, we don't add any off-diagonal entries, but [instead scale the diagonal values to our "scaling factor" (i.e., for a scale of 2 we would multiply the diagonal values by 2 each)
+```{r scaling}
+x11()
+identity_matrix <- diag(2)
+
+for (i in seq(0, 3, length.out=100)){
+  # Scaling up our transformation matrix
+  scale_matrix <- identity_matrix * i
+  
+  # Multiplying letter vectors by scale matrix
+  scaled_vector <- apply(z, 2, function(x) scale_matrix %*% x)
+  plot(scaled_vector[2,] ~ scaled_vector[1,], xlim=c(-3,3), ylim = c(-3,3))
+}
+```
+
+## Rotation
+[Rotation matrices have $sine$ and $cosine$ entries of some specified angle $\theta$](https://en.wikipedia.org/wiki/Rotation_matrix)
+```{r rotation}
+x11()
+for (theta in seq(0, 3, length.out=100)){
+  # Creating rotation matrix with parameterized angle theta
+  rotation_matrix <-  matrix(c(cos(theta), -sin(theta),
+                               sin(theta), cos(theta)), nrow = 2, ncol = 2)
+  
+  # Multiplying letter vectors by rotation matrix and plotting
+  rotated_vector <- apply(z, 2, function(x) rotation_matrix %*% x)
+  plot(rotated_vector[2,] ~ rotated_vector[1,], xlim=c(-3,3), ylim = c(-3,3))
+}
+```
+
+## Projection
+[Projection matrices](https://en.wikipedia.org/wiki/Projection_(linear_algebra)) essentially flatten a vector in one-direction, on
+
+```{r projection}
+x11()
+projection_matrix <- diag(2)
+for (i in seq(3, 0, length.out=100)){
+  # Updating 
+  projection_matrix[2,2] = i
+  
+  # Multiplying letter vectors by projection matrix and plotting
+  projection <- apply(z, 2, function(x) projection_matrix %*% x)
+  plot(projection[2,] ~ projection[1,], xlim=c(-3,3), ylim = c(-3,3))
+}
+```
