@@ -1,0 +1,351 @@
+---
+title: "DATA605 Assignment 3"
+author: "Andrew Bowen"
+date: "2023-02-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. What is the rank of the matrix A?
+
+\begin{align}
+  A = \begin{bmatrix} 
+        1 & 2 & 3 & 4 \\
+        -1 & 0 & 1 & 3 \\
+        0 & 1 & -2 & 1 \\
+        5 & 4 & -2 & -3 \\
+      \end{bmatrix}
+\end{align}
+
+Let's try to pivot the second colum:
+- $R_2 = R_2 / 2$.   
+- $R_1 = R_1 - 2R2$.   
+- $R_3 = R_3 - R_2$.   
+- $R_4 = R_4 + 6 R_2$.   
+\begin{align} 
+    \begin{bmatrix}
+      1 & 2 & 3 & 4 \\
+      0 & 2 & 4 & 7 \\
+      0 & 1 & -2 & 1 \\
+      5 & 4 & -2 & -3 \\
+    \end{bmatrix}
+\end{align}
+
+Subtract 5 times row 1 from row 5
+\begin{align} 
+    \begin{bmatrix}
+      1 & 2 & 3 & 4 \\
+      0 & 2 & 4 & 7 \\
+      0 & 1 & -2 & 1 \\
+      0 & -6 & -17 & -23 \\
+    \end{bmatrix} \rightarrow
+    % divide row 2 by 2 and subtract to get pivot in second col
+    \begin{bmatrix}
+      1 & 2 & 3 & 4 \\
+      0 & 1 & 2 & \frac{7}{2} \\
+      0 & 1 & -2 & 1 \\
+      0 & -6 & -17 & -23 \\
+    \end{bmatrix} \rightarrow
+    \begin{bmatrix}
+    1 & 0 & -1 & -3 \\
+    0 & 1 & 2 & \frac{7}{2} \\
+    0 & 0 & -4 & \frac{-5}{2} \\
+    0 & 0 & -5 & -2 \\
+  \end{bmatrix}
+\end{align}
+
+Now let's try to pivot the third column. We need to perform row operations on the first, second, and third row:
+
+- Divide $R_3$ by -4
+- Add Row 3 to Row 4
+- Subtract $2 * R_3$ from $R_2$
+- Add $\frac{-5}{4} R_3$ to $R_4$
+\begin{align}
+  \begin{bmatrix}
+    1 & 0 & -1 & -3 \\
+    0 & 1 & 2 & \frac{7}{2} \\
+    0 & 0 & -4 & \frac{-5}{2} \\
+    0 & 0 & -5 & -2 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & -1 & -3 \\
+    0 & 1 & 2 & \frac{7}{2} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & -5 & -2 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & 0 & \frac{-19}{8} \\
+    0 & 1 & 2 & \frac{7}{2} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & -5 & -2 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & 0 & \frac{-19}{8} \\
+    0 & 1 & 0 & \frac{9}{4} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & -5 & -2 \\
+  \end{bmatrix} \rightarrow
+   \begin{bmatrix}
+    1 & 0 & 0 & \frac{-19}{8} \\
+    0 & 1 & 0 & \frac{9}{4} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & 0 & \frac{9}{8} \\
+  \end{bmatrix}
+  
+\end{align}
+
+Lastly, let's try to pivot the final column. If we end up with the identity matrix $I_4$, we'll be able to say that $rank(A) = 4$ as we'll have 4 linearly independent column vectors. We'll perform the row operations below:
+
+- Multiply $R_4$ by $\frac{8}{9}$
+- $R_1 = \frac{19}{8} * R_4 + R1$
+
+\begin{align}
+   \begin{bmatrix}
+    1 & 0 & 0 & \frac{-19}{8} \\
+    0 & 1 & 0 & \frac{9}{4} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & 0 & \frac{9}{8} \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & 0 & \frac{-19}{8} \\
+    0 & 1 & 0 & \frac{9}{4} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & 0 & 1 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & \frac{9}{4} \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & 0 & 1 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & \frac{-5}{8} \\
+    0 & 0 & 0 & 1 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 1 \\
+  \end{bmatrix}
+  
+\end{align}
+We have 4 linearly independent column vectors, and as a result we can say this matrix $A$ is of rank 4. We can check out work with the R code below
+
+```{r question-1}
+library(Matrix)
+sampleMatrix <- matrix(c(1,-1,0,5,2,0,1,4,3,2,-2,-2,4,3,1,-3), nrow=4, ncol=4)
+
+rankMatrix(sampleMatrix)
+```
+
+2. Given an mxn matrix where m > n, what can be the maximum rank? The minimum rank, assuming that the matrix is non-zero?
+
+Taking $m$ tobe the number of rows of $m x n$ matrix A, and $n$ to be the number of columns, and that the *rank* of a matrix is the number of linearly-independent column vectors:
+
+- The *maximum* rank is $n$, as there can be at most $n$ linearly independent column vectors, if A is non-singular, and all column vectors are linearly independent.
+- The *minimum* rank is 1, assuming $A$ is non-zero. In this case column vectors $a_j$ are scalar multiples of one of the column vectors $a_i$
+
+3.  What is the rank of the matrix B?
+
+\begin{align}
+  A = \begin{bmatrix} 
+    1 & 2 & 1 \\
+    3 & 6 & 3 \\
+    2 & 4 & 2 \\
+    \end{bmatrix}
+\end{align}
+
+We could row-reduce matrix $B$, however, it appears that column vectors $\hat{b_2}$ and $\hat{b_3}$ are scalar multiples of column vector $\hat{b_1}$. Because of this, there is only 1 linearly independent vectror in $B$, and thus its rank is 1
+
+To verify, we can check with the below R code:
+```{r rank-b}
+library(Matrix)
+B <- matrix(c(1,2,1,3,6,3,2,4,2), nrow=3, ncol=3)
+
+rankMatrix(B)
+```
+
+
+4. Compute the eigenvalues and eigenvectors of the matrix A. You’ll need to show your work. You’ll need to write out the characteristic polynomial and show your solution.
+
+\begin{align}
+  A = \begin{bmatrix} 
+    1 & 2 & 3 \\
+    0 & 4 & 5 \\
+    0 & 0 & 6 \\
+    \end{bmatrix}
+\end{align}
+
+We can calculate the eigenvalues of $A$ from determining the roots of the characteristic polynomial $p_{A}(\lambda)$. This can be determined by solving the equation $det(A - \lambda I_n)$
+
+$$
+det(A - \lambda I_n)
+$$
+\begin{align}
+A - \lambda I_n = \begin{bmatrix} 
+    1 & 2 & 3 \\
+    0 & 4 & 5 \\
+    0 & 0 & 6 \\
+    \end{bmatrix} - \begin{bmatrix} 
+    \lambda & 0 & 0 \\
+    0 & \lambda & 0 \\
+    0 & 0 & \lambda \\
+    \end{bmatrix} = \begin{bmatrix} 
+    1 - \lambda & 2 & 3 \\
+    0 & 1 - \lambda & 5 \\
+    0 & 0 & 1 - \lambda \\
+    \end{bmatrix}
+\end{align}
+
+We need to compute the values of $\lambda$ that make the determinant of this resulting matrix 0. We can use the [rule of sarrus](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiVpbDA0o39AhX-jYkEHcLrCUgQFnoECBMQAw&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FRule_of_Sarrus&usg=AOvVaw05I5MsNNL7DmLR4onyCGnv) given that this is a $3 x 3$ matrix
+
+$$
+det(A - \lambda I_n) = (1 - \lambda)(4 - \lambda)(6 -\lambda)
+$$
+The characteristic polynomial of this matrix is:
+
+$$
+p_A(x) = (1 - x)(4 - x)(6 - x) = (1 - x)(24 - 10x + x^{2}) = x^3 + 11x^2 - 34x + 24
+$$
+We can see the roots of this equation are $\lambda = 1, 4, 6$. These are the *eigenvalues* of this matrix. We can use these to now determine the eigenvectors associated with each. To do this, we'll go through each $\lambda$ value "case", solving for the system of equations $0 = (A - \lambda I)\hat{v}$
+
+##### $\lambda = 1$
+\begin{align}
+  A - \lambda I = \begin{bmatrix} 
+    0 & 2 & 3 \\
+    0 & 3 & 5 \\
+    0 & 0 & 5 \\
+    \end{bmatrix}
+\end{align}
+
+We can row-reduce this matrix to solve the above system of equations:
+
+\begin{align}
+  A - \lambda I = \begin{bmatrix} 
+    0 & 2 & 3 \\
+    0 & 3 & 5 \\
+    0 & 0 & 5 \\
+    \end{bmatrix} \rightarrow 
+    \begin{bmatrix} 
+    0 & 1 & \frac{3}{2} \\
+    0 & 3 & 5 \\
+    0 & 0 & 5 \\
+    \end{bmatrix} \rightarrow
+     \begin{bmatrix} 
+    0 & 1 & \frac{3}{2} \\
+    0 & 0 & \frac{1}{2} \\
+    0 & 0 & 5 \\
+    \end{bmatrix} \rightarrow
+    \begin{bmatrix} 
+    0 & 1 & \frac{3}{2} \\
+    0 & 0 & 1 \\
+    0 & 0 & 5 \\
+    \end{bmatrix} \rightarrow
+    \begin{bmatrix} 
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+    \end{bmatrix}
+\end{align}
+
+So in this case, we can have $x_1$ be a free parameter, while $x_2$ and $x_3$ are 0, with the eigenvector solution $\hat{v_1} = \begin{pmatrix}1 \\ 0 \\ 0 \end{pmatrix}$
+
+
+##### $\lambda = 4$
+\begin{align}
+  A - \lambda I = \begin{bmatrix} 
+    -3 & 2 & 3 \\
+    0 & 0 & 5 \\
+    0 & 0 & 2 \\
+    \end{bmatrix}
+\end{align}
+
+From this system of equations we can use row reduction
+
+
+\begin{align}
+  \begin{bmatrix} 
+    -3 & 2 & 3 \\
+    0 & 0 & 5 \\
+    0 & 0 & 2 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix} 
+    1 & -2/3 & -1 \\
+    0 & 0 & 5 \\
+    0 & 0 & 2 \\
+  \end{bmatrix}
+\end{align}
+
+Next let's divide to get a pivot in the second row:
+\begin{align}
+  \begin{bmatrix} 
+    -3 & 2 & 3 \\
+    0 & 0 & 1 \\
+    0 & 0 & 2 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix} 
+    -3 & 2 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & 0 \\
+  \end{bmatrix}
+\end{align}
+
+So we have a free parameter for $x_2$ and the relationship from the first row that $x_1 = \frac{2}{3}x_2$. So we have the eigenvector solution: $\hat{v_4} = \begin{pmatrix} \frac{2}{3} \\ 1 \\ 0 \end{pmatrix}$ when $\lambda = 4$
+
+##### $\lambda = 6$
+\begin{align}
+  A - \lambda I = \begin{bmatrix} 
+    -5 & 2 & 3 \\
+    0 & -2 & 5 \\
+    0 & 0 & 0 \\
+    \end{bmatrix}
+\end{align}
+
+Again, we can row-reduce to find an eigenvector solution where this system equals the zero vector
+
+\begin{align}
+  \begin{bmatrix} 
+   -5 & 2 & 3 \\
+    0 & -2 & 5 \\
+    0 & 0 & 0 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & -2/5 & \frac{-3}{5} \\
+    0 & -2 & 5 \\
+    0 & 0 & 0 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & -\frac{2}{5} & -\frac{3}{5}\\
+    0  & 1 & -\frac{5}{2} \\
+    0 & 0 & 0 \\
+  \end{bmatrix} \rightarrow
+  \begin{bmatrix}
+    1 & 0 & -\frac{8}{5}\\
+    0 & 1 & -\frac{5}{2} \\
+    0 & 0 & 0 \\
+  \end{bmatrix}
+  
+\end{align}
+
+From here we can solve the system of equations via 
+\begin{align}
+    x_1 - \frac{8}{5}x_3 = 0\newline
+    x_2 - \frac{5}{2}x_3 = 0
+
+\end{align}
+
+From this we can get the solution vector $\hat{v_6} = \begin{pmatrix} \frac{8}{5} \\ \frac{5}{2} \\ 1 \end{pmatrix}$
+
+We can check our work with the R 
+
+```{r eigen}
+A <- matrix(c(1,0,0,2,4,0,3,5,6), 3, 3)
+
+eigen(A)
+```
