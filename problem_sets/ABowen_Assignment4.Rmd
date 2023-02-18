@@ -1,0 +1,96 @@
+---
+title: 'DATA605: Assignment 4'
+author: "Andrew Bowen"
+date: "2023-02-15"
+output: html_document
+bibliography: assignment3-references.bib
+nocite: "@*"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r libraries echo=FALSE}
+library("jpeg")
+library("OpenImageR")
+library("ggplot2")
+```
+
+Reading in shoe images
+```{r read-images}
+data <- matrix(0, nrow=17, ncol=9000000)
+files <- list.files("../data/shoes")
+
+# Read in each image in our data directory
+for (i in 1:length(files)){
+  filepath <- file.path("../data/shoes", files[i])
+  
+  # Resizing images, otherwise we run into local memory problems as the image matrix becomes too large
+  img <- resizeImage(readJPEG(filepath, native=FALSE), 1200 / 20, 2500 / 20)
+  
+  # Extract the RGB values from our array and append them to a single array
+  r  <- as.vector(img[,,1])
+  g  <- as.vector(img[,,2])
+  b  <- as.vector(img[,,3])
+  vec <- c(r, g, b)
+  data[i, ] <- c(r, g, b)
+
+
+}
+
+print(dim(data))
+```
+
+
+Let's convert our matrix to a dataframe. We're taking the transpose (`t()`) of our image matrix because we want each column of our dataframe to be a vector representing one input image.
+```{r data-to-df}
+shoes <- data.frame(x=t(data))
+```
+
+Now we need to center the mean dataframe using the built-in `scale` function. The idea here is to make the subtract the mean form our data, so that the dataset has a mean of zero.
+```{r center-data}
+scaled <- scale(data, center = TRUE, scale = TRUE)
+mean_shoe <- attr(scaled, "scaled:center")
+std_shoe  <- attr(scaled, "scaled:scale")
+```
+
+Calculate covariance matrix of our scaled matrix. We can use the built-in R `cov` function. Since we're dealing with such a large array, we'll need to use the `Sys.setenv('R_MAX_VSIZE'=32000000000)` command to allocate enough memory.
+```{r calculate-covariance}
+sigma <- cor(scaled)
+```
+
+
+Get eigenvalues and eigenvectors from our covariance matrix. These should represent the principal components of our input dataset. 
+```{r get-eigen}
+eigen <- eigen(sigma)
+eigenvalues  <- eigen$values
+eigenvectors <- eigen$vectors
+```
+
+Choosing principal components from the
+```{r cumulative-sum}
+cumulative_sum <- cumsum(eigenvalues) / sum(eigenvalues)
+# We want to account for 80% of the variability in our input image dataset, so we'll set the threshold criterion to 0.8
+thres <- min(which(cumulative_sum > 0.80))
+```
+
+Creating a [scree plot of our eigenvalues](https://en.wikipedia.org/wiki/Scree_plot). The "turning point/elbow" of this graph shows us the number of eigenvalues/eigenvectors we should be using.
+```{r pca}
+pca_data <- data.frame(eigenvalues, cumulative_sum)
+ggplot(data=pca_data, aes(x = eigenvalues, y = cumulative_sum)) + geom_line()
+```
+
+
+```{r eigenshoes}
+scaling <- diag(eigenvalues[1:thres] ^ (-1/2)) / (sqrt(nrow(scaled)-1))
+eigenshoes <- scaled %*% eigenvectors[, 1:thres] %*% scaling
+
+# Get eigneshoe image and plot
+eigenshoe <- array(eigenshoes[,2],  c(60,125,3))
+imageShow(eigenshoe)
+```
+
+
+### References
