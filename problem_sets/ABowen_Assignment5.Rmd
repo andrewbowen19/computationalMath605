@@ -1,0 +1,175 @@
+---
+title: 'DATA605: Assignment 5'
+author: "Andrew Bowen"
+date: "2023-02-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1.  (Bayesian). A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1 (HIV-1) variants was recently developed. The test maintains 96% sensitivity, meaning that, for those with the disease, it will correctly report “positive” for 96% of them. The test is also 98% specific, meaning that, for those without the disease, 98% will be correctly reported as “negative.” MNR HIV-1 is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate. Given the prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is reported as positive by the new test actually has the disease? If the median cost (consider this the best point estimate) is about $100,000 per positive case total and the test itself costs \$1000 per administration, what is the total first-year cost for treating 100,000 individuals?
+
+
+We can use Bayes' rule to solve for the posteriro here:
+
+\begin{aligned}
+  P(disease | positive) = \frac{P(disease)P(positive | disease)}{P(positive)}
+\end{aligned}
+
+Plugging in the respective probabilities outlined above, we get
+
+\begin{aligned}
+  P(disease | positive) = \frac{(0.001)(0.96)}{(0.96 * 0.001) + (0.999 * 0.002)} \approx 0.045 \approx 4.5\%
+\end{aligned}
+  
+2. (Binomial). The probability of your organization receiving a Joint Commission inspection in any given month is .05. What is the probability that, after 24 months, you received exactly 2 inspections? What is the probability that, after 24 months, you received 2 or more inspections? What is the probability that your received fewer than 2 inspections? What is the expected number of inspections you should have received? What is the standard deviation?
+  
+Using the binomial distribution:
+
+\begin{aligned}
+  P(k:n, p) = {n \choose k} p^k (1 - p)^{n - k}
+\end{aligned}
+
+Plugging in our values of $p = 0.05, n =24, k = 2$, we get:
+
+\begin{equation}
+  P(2:24, 0.05) = {24 \choose 2} (0.05)^2(0.95)^22 \approx 22\%
+\end{equation}
+  
+We can check out work with the built-in R `dbinom` function
+```{r binom-check}
+0.22 == round(dbinom(2,24, 0.05), 2)
+```
+3.  (Poisson). You are modeling the family practice clinic and notice that patients arrive at a rate of 10 per hour. What is the probability that exactly 3 arrive in one hour? What is the probability that more than 10 arrive in one hour? How many would you expect to arrive in 8 hours? What is the standard deviation of the appropriate probability distribution? If there are three family practice providers that can see 24 templated patients each day, what is the percent utilization and what are your recommendations?
+
+We have $\lambda = 10$ and $k = 3$. We can plug these values into the [Poisson distribution](https://www.sciencedirect.com/topics/mathematics/poisson-distribution):
+
+\begin{equation}
+  P(X = k) = \frac{\lambda^k}{k!} \exp{-\lambda}
+\end{equation}
+
+```{r poisson-func}
+poisson_dist <- function(lambda, k){
+  prob <- exp(-lambda) * (lambda ** k) / (factorial(k))
+  return(prob)
+}
+
+# Probability of exactly 3 in one hour
+poisson_dist(10, 3)
+```
+  
+We can use the above function iteratively to find the probability that more than 10 arrvie in one hour
+```{r prob-more-than-10}
+avg_rate <- 10 # given lambda
+cumulative_probability <- 0
+for (i in c(1:10)){
+  prob <- poisson_dist(avg_rate, i)
+  cumulative_probability <- cumulative_probability + prob
+}
+
+1 - cumulative_probability
+```
+  
+If the average rate of arrival is 10 per hour, I would expect $8 * 10 = 80$ arrivals  in 8 hours. The [standard deviation of the poison distribution](https://www.sciencedirect.com/topics/mathematics/poisson-distribution) is $\sqrt{\lambda} = \sqrt{10} = 3.16$
+
+
+4. (Hypergeometric). Your subordinate with 30 supervisors was recently accused of favoring nurses. 15 of the subordinate’s workers are nurses and 15 are other than nurses. As evidence of malfeasance, the accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible. The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the probability he/she would have selected five nurses for the trips? How many nurses would we have expected your subordinate to send? How many non-nurses would we have expected your subordinate to send?
+
+  
+We can use the hypergeometric distribution:
+
+\begin{equation}
+  h(N, k, n, x) = \frac{{k \choose x}{N - k \choose n - x}}{{N \choose n}}
+\end{equation}
+
+Plugging in our values of $N = 30, k = 15, n = 6, x = 5$, we get:
+\begin{equation}
+  h(30, 15, 6, 5) = \frac{{15 \choose 5}{15 \choose 1}}{{30 \choose 6}} \approx 0.075
+\end{equation}
+  
+Assuming no preference for nurses vs non-nurses, I would expect 3 nurses and non-nurses to be selected, as this reflects the "population" of employees more accurately.
+
+
+5. (Geometric). The probability of being seriously injured in a car crash in an unspecified location is about .1% per hour. A driver is required to traverse this area for 1200 hours in the course of a year. What is the probability that the driver will be seriously injured during the course of the year? In the course of 15 months? What is the expected number of hours that a driver will drive before being seriously injured? Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours?
+
+
+Geometric distribution:
+
+\begin{equation}
+  P(X = k) = p(1 - p)^{k -1}
+\end{equation}
+
+Plugging in our values of $p = 0.001, k = 1200$, we get:
+
+\begin{equation}
+  P(X = k) = 0.001 ( 0.999 )^1200 \approx 0.0003
+\end{equation}
+
+Over the cours eof 15 months, we adjust our $k$ value ($k = 1500$):
+
+\begin{equation}
+  P(X = k) = 0.001 ( 0.999 )^1500 \approx 0.0002
+\end{equation}
+
+The [mean/expected value of the geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution) is $\frac{1 - p}{p} Plugging in our probability, we get
+```{r}
+exp_value <- (1 / 0.001)
+```
+
+
+6. You are working in a hospital that is running off of a primary generator which fails about once in 1000 hours. What is the probability that the generator will fail more than twice in 1000 hours? What is the expected value?
+
+Again, we can use the poisson distribution and our `poisson_dist` function from earlier
+
+```{r}
+avg_rate <- 1 # given lambda
+cumulative_probability <- 0
+
+# We want to subract the events where k = 0, 1, or 2 from our sample space
+for (i in c(0:2)){
+  prob <- poisson_dist(avg_rate, i)
+  cumulative_probability <- cumulative_probability + prob
+}
+
+1 - cumulative_probability
+```
+
+The expected value is 0.001 failures per hour, assuming we take 1 hour to be our "base unit" of time.
+
+7. A surgical patient arrives for surgery precisely at a given time. Based on previous analysis (or a lack of knowledge assumption), you know that the waiting time is uniformly distributed from 0 to 30 minutes. What is the probability that this patient will wait more than 10 minutes? If the patient has already waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being seen? What is the expected waiting time?
+
+a) If the distribution is uniform, then the probability the patient waits for longer than 10 minutes is $2/3 \approx 66\%$. 
+b) If they've already waited 10 minutes, we can use the latter two thirds of our uniform distribution, which would yield $5/20 = 0.25$
+c) The expected waiting time is 15 minutes, or the midpoint of our uniform distribution from 0 to 30 minutes.
+
+
+8. Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value). Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution. What is the expected failure time? What is the standard deviation? What is the probability that your MRI will fail after 8 years? Now assume that you have owned the machine for 8 years. Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?
+
+The exponential distribution is given by:
+
+\begin{equation}
+  f(x; \lambda) = \lambda\exp{-\lambda x}
+\end{equation}
+
+The expected failure time is 10 years, as that's the amount of time we'd expect a random MRI to last. The [standard deviation of the exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution) is equal to the mean, so in this case it would be 10. 
+
+For the probability fo failure after 8 years, we can use the R code below:
+
+```{r}
+lambda <- 0.1
+x <- 8
+
+prob_mri <- lambda * exp(-lambda * x)
+prob_mri
+```
+
+Given that the [exponential distribution is memoryless](https://en.wikipedia.org/wiki/Exponential_distribution#Memorylessness), we can calculate the probability of failure in the next 2 years
+
+```{r}
+lambda2 <- 0.1
+x2 <- 2
+prob_mri2 <- lambda2 * exp(-lambda2 * x2)
+prob_mri2
+```

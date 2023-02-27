@@ -1,0 +1,53 @@
+---
+title: "DATA605 Discussion Post 5"
+author: "Andrew Bowen"
+date: "2023-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, echo=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+**23.** Write a program that picks a random number between 0 and 1 and computes the negative of its logarithm. Repeat this process a large number of times and plot a bar graph to give the number of times that the outcome falls in each interval of length 0.1 in `[0, 10]`. On this bar graph plot a graph of the density $f(x) = e^{−x}$. How well does this density fit your graph?
+
+First, let's set our seed for reproducability
+```{r set-seed}
+set.seed(12345)
+```
+
+Next, let's generate a large number of random numbers. For our purposes, let's do 10,000
+```{r}
+# Number of trials
+n <- 1000
+
+x = c(seq(n))
+y <- c()
+
+for (i in 1:n){
+  # Grab one random negativer log from unifrom distribution between 0 and 1 and store it in y vector
+  result <- -log(runif(n=1, min=0, max=1))
+  y <- append(y, result)
+}
+```
+
+Now let's plot our results and the function $F(x) = e^{-x}$.
+```{r}
+# Put x and y vectors into dataframe
+df <- data.frame(x, y)
+
+log_func <- function(x){-log(x)}
+
+# plot histogram binned by each interval of length 0.1
+ggplot(df, aes(y)) + geom_histogram(binwidth=0.1, boundary=0.1) +
+  stat_function(fun=log_func, colour='red') + xlab("x")
+```
+
+
+The density function above (plotted in red) doesn't fit our distribution of randomly-generated perfectly, but does reflect a similar exponential shape. This scaling comes in with a coefficient that ensures the density function integrates to 1, and we can use it to reflect probailities, as a probability over 1 doesn't make sense. 
+

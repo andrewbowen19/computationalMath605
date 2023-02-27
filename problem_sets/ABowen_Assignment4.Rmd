@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r libraries echo=FALSE}
+```{r libraries, echo=FALSE}
 library("jpeg")
 library("OpenImageR")
 library("ggplot2")
@@ -20,7 +20,7 @@ library("ggplot2")
 
 Reading in shoe images
 ```{r read-images}
-data <- matrix(0, nrow=17, ncol=9000000)
+shoes <- matrix(0, nrow=17, ncol=9000000)
 files <- list.files("../data/shoes")
 
 # Read in each image in our data directory
@@ -35,30 +35,30 @@ for (i in 1:length(files)){
   g  <- as.vector(img[,,2])
   b  <- as.vector(img[,,3])
   vec <- c(r, g, b)
-  data[i, ] <- c(r, g, b)
+  shoes[i, ] <- c(r, g, b)
 
 
 }
 
-print(dim(data))
+print(dim(shoes))
 ```
 
 
 Let's convert our matrix to a dataframe. We're taking the transpose (`t()`) of our image matrix because we want each column of our dataframe to be a vector representing one input image.
 ```{r data-to-df}
-shoes <- data.frame(x=t(data))
+shoes <- data.frame(x=t(shoes))
 ```
 
 Now we need to center the mean dataframe using the built-in `scale` function. The idea here is to make the subtract the mean form our data, so that the dataset has a mean of zero.
 ```{r center-data}
-scaled <- scale(data, center = TRUE, scale = TRUE)
+scaled <- scale(shoes, center = TRUE, scale = TRUE)
 mean_shoe <- attr(scaled, "scaled:center")
 std_shoe  <- attr(scaled, "scaled:scale")
 ```
 
 Calculate covariance matrix of our scaled matrix. We can use the built-in R `cov` function. Since we're dealing with such a large array, we'll need to use the `Sys.setenv('R_MAX_VSIZE'=32000000000)` command to allocate enough memory.
 ```{r calculate-covariance}
-sigma <- cor(scaled)
+sigma <- cov(scaled)
 ```
 
 
