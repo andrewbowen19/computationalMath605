@@ -1,0 +1,169 @@
+---
+title: "DATA605 Problem Set 6"
+author: "Andrew Bowen"
+date: "2023-02-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First, let's defnie a function that will come in handy. There are several points in this assignment in which we multiply in a factorial method (e.g., $20 \cdot 19 \cdot 18 \cdot \dots $), but don't multiply recursively to $1$. We'll define a "partial" factorial function below multiplying 
+
+\begin{equation}
+  PF(n, k) = \frac{n!}{(k - 1)!}
+\end{equation}
+
+It should be noted in the case $k = 1$ that $PF(n, 1) = n!$
+```{r partial-factorial}
+# Computes "partial" factorial 
+ # E.g., partial_factorial(6, 3) = 6 * 5 * 4 * 3 = 360
+partial_factorial <- function(high, low){
+  m <- low - 1 
+  pf <- factorial(high) / factorial(m)
+  return(pf)
+  
+}
+
+# Test call of above function def
+360 == partial_factorial(6, 3)
+60 == partial_factorial(5, 3)
+```
+
+1. A bag contains 5 green and 7 red jellybeans. How many ways can 5 jellybeans be withdrawn from the bag so that the number of green ones withdrawn will be less than 2?
+
+There are 2 outcomes in which less than 2 green jellybeans are drawn: either 6 or 7 red jellybeans are drawn. 
+```{r jellybeans}
+jellybeans <- (choose(7, 7) * choose(5, 0)) + (choose(7, 6) * choose(5, 1))
+jellybeans
+```
+
+2. *A certain congressional committee consists of 14 senators and 13 representatives. How many ways can a subcommittee of 5 be formed if at least 4 of the members must be representatives?*
+
+```{r congress}
+n_reps <- 13
+n_senate <- 14
+members <- n_reps + n_senate
+
+seat_combos <- partial_factorial(13, 10) * (members - 4)
+seat_combos
+```
+
+
+3. *If a coin is tossed 5 times, and then a standard six-sided die is rolled 2 times, and finally a group of three cards are drawn from a standard deck of 52 cards without replacement, how many different outcomes are possible?*
+
+These are independent events, so we can multiply the number of outcomes of each "experiemnt" (dice, coins, card)
+```{r}
+coin <- 2 ** 5
+dice <- 6 ** 2
+cards <- 52 * 51 * 50
+
+total_outcomes <- coin * dice * cards
+total_outcomes
+```
+
+4. *3 cards are drawn from a standard deck without replacement. What is the probability that at least one of the cards drawn is a 3? Express your answer as a fraction or a decimal number rounded to four decimal places.*
+```{r card-probability}
+n_cards <- 52
+n_success <- 4
+cumulative_probability <- 1
+for (i in 0:2){
+  cumulative_probability <- cumulative_probability * (n_success - i) / (n_cards - 1)
+}
+
+cumulative_probability
+```
+
+5. *Lorenzo is picking out some movies to rent, and he is primarily interested in documentaries and mysteries. He has narrowed down his selections to 17 documentaries and 14 mysteries.*
+
+  a. *How many different combinations of 5 movies can he rent?*
+There are 31 total movies so we can use the `choose` functiont o calculate this number of outcomes
+```{r movies}
+n_movies <- 31
+n_movie_slots <- 5
+
+choose(n_movies, n_movie_slots)
+```
+
+  b. *How many different combinations of 5 movies can he rent if he wants at least one mystery?*
+  
+We can treat the first movie "place" as any of the 14 mysteries. Then we can treat it as a selection problem with replacement
+```{r}
+14* partial_factorial(30, 27)
+```
+
+6. *In choosing what music to play at a charity fund raising event, Cory needs to have an equal number of symphonies from Brahms, Haydn, and Mendelssohn. If he is setting up a schedule of the 9 symphonies to be played, and he has 4 Brahms, 104 Haydn, and 17 Mendelssohn symphonies from which to choose, how many different schedules are possible? Express your answer in scientific notation rounding to the hundredths place.*
+
+We can also treat this problem as selection of 3 places for each composer with replacement (since this is a schedule, if he chooses Haydn symphony 1 before symphony 2, that would be considered a different schedule than the alternative order)
+
+\begin{equation}
+  \underbrace{4 \cdot 3 \cdot 2}_{Brahms}
+\end{equation}
+
+```{r composers}
+brahms <- 4 * 3 * 2
+haydn <- 104 * 103 * 102
+mendelssohn <- 17 * 16 *15
+composers <- brahms * haydn * mendelssohn
+
+format(composers, digits=3, scientific=TRUE)
+```
+
+
+7. *An English teacher needs to pick 13 books to put on his reading list for the next school year, and he needs to plan the order in which they should be read. He has narrowed down his choices to 6 novels, 6 plays, 7 poetry books, and 5 nonfiction books.*
+
+  a. *If he wants to include no more than 4 nonfiction books, how many different reading schedules are possible? Express your answer in scientific notation rounding to the hundredths place.*
+
+There are 13 total "book slots" in the schedule, and 4 spots are designated as "non-fiction" slots. 
+
+We can express this with our `partial_factorial` computing the number of non-fiction combinations (9 slots after selection of 4 non-fiction books) multiplied by the number of non-fiction book selections: $5 * 4 * 3 * 2$
+```{r book-schedule}
+nonfiction_schedules <- partial_factorial(5, 4) * partial_factorial(20, 12)
+format(nonfiction_schedules, digits=3, scientific=TRUE)
+```
+
+
+  **Step 2.** *If he wants to include all 6 plays, how many different reading schedules are possible? Express your answer in scientific notation rounding to the hundredths place.*
+  
+```{r}
+all_plays <- factorial(6) * partial_factorial(13, 7)
+format(all_plays, digits=3, scientific=TRUE)
+```
+  
+
+8. *Zane is planting trees along his driveway, and he has 5 sycamores and 5 cypress trees to plant in one row. What is the probability that he randomly plants the trees so that all 5 sycamores are next to each other and all 5 cypress trees are next to each other? Express your answer as a fraction or a decimal number rounded to four decimal places.*
+
+
+
+9. *If you draw a queen or lower from a standard deck of cards, I will pay you $4. If not, you
+pay me \$16. (Aces are considered the highest card in the deck.)*
+
+  a. *Find the expected value of the proposition. Round your answer to two decimal places. Losses must be expressed as negative values.*
+There are 2 outcomes: `success` (king or ace drawn), or `failure` (queen or lower). We can calculate the expected value as the probability of success multiplied by the success payout (\$4) plus the probability of fialure multiplied by the failure "payout" (-\$16 or a \$16 loss)
+```{r}
+n <- 52
+n_ka <- 8 # number of kings & aces in deck
+
+prob_success <- n_ka / n
+prob_failure <- (n - n_ka) / n
+
+# Calculate expected value
+expected_value <- round((4 * prob_failure) + (-16 * prob_failure), 2)
+expected_value
+```
+
+  b. *If you played this game 833 times how much would you expect to win or lose? Round your answer to two decimal places. Losses must be expressed as negative values.*
+
+We can multiply our expected value by the number of trials ($833$)
+```{r}
+expected_value * 833
+```
+
+
+
+
+
+  
+  
+  

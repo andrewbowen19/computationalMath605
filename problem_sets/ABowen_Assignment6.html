@@ -11,9 +11,9 @@
 
 <meta name="author" content="Andrew Bowen" />
 
-<meta name="date" content="2023-02-26" />
+<meta name="date" content="2023-02-27" />
 
-<title>DATA605: Assignment 5</title>
+<title>DATA605 Problem Set 6</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -356,231 +356,198 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">DATA605: Assignment 5</h1>
+<h1 class="title toc-ignore">DATA605 Problem Set 6</h1>
 <h4 class="author">Andrew Bowen</h4>
-<h4 class="date">2023-02-26</h4>
+<h4 class="date">2023-02-27</h4>
 
 </div>
 
 
-<ol style="list-style-type: decimal">
-<li>(Bayesian). A new test for multinucleoside-resistant (MNR) human
-immunodeficiency virus type 1 (HIV-1) variants was recently developed.
-The test maintains 96% sensitivity, meaning that, for those with the
-disease, it will correctly report “positive” for 96% of them. The test
-is also 98% specific, meaning that, for those without the disease, 98%
-will be correctly reported as “negative.” MNR HIV-1 is considered to be
-rare (albeit emerging), with about a .1% or .001 prevalence rate. Given
-the prevalence rate, sensitivity, and specificity estimates, what is the
-probability that an individual who is reported as positive by the new
-test actually has the disease? If the median cost (consider this the
-best point estimate) is about $100,000 per positive case total and the
-test itself costs $1000 per administration, what is the total first-year
-cost for treating 100,000 individuals?</li>
-</ol>
-<p>We can use Bayes’ rule to solve for the posteriro here:</p>
-<span class="math display">\[\begin{aligned}
-  P(disease | positive) = \frac{P(disease)P(positive |
-disease)}{P(positive)}
-\end{aligned}\]</span>
-<p>Plugging in the respective probabilities outlined above, we get</p>
-<span class="math display">\[\begin{aligned}
-  P(disease | positive) = \frac{(0.001)(0.96)}{(0.96 * 0.001) + (0.999 *
-0.002)} \approx 0.045 \approx 4.5\%
-\end{aligned}\]</span>
-<ol start="2" style="list-style-type: decimal">
-<li>(Binomial). The probability of your organization receiving a Joint
-Commission inspection in any given month is .05. What is the probability
-that, after 24 months, you received exactly 2 inspections? What is the
-probability that, after 24 months, you received 2 or more inspections?
-What is the probability that your received fewer than 2 inspections?
-What is the expected number of inspections you should have received?
-What is the standard deviation?</li>
-</ol>
-<p>Using the binomial distribution:</p>
-<span class="math display">\[\begin{aligned}
-  P(k:n, p) = {n \choose k} p^k (1 - p)^{n - k}
-\end{aligned}\]</span>
-<p>Plugging in our values of <span class="math inline">\(p = 0.05, n
-=24, k = 2\)</span>, we get:</p>
+<p>First, let’s defnie a function that will come in handy. There are
+several points in this assignment in which we multiply in a factorial
+method (e.g., $20 $), but don’t multiply recursively to <span class="math inline">\(1\)</span>. We’ll define a “partial” factorial
+function below multiplying</p>
 <p><span class="math display">\[\begin{equation}
-  P(2:24, 0.05) = {24 \choose 2} (0.05)^2(0.95)^22 \approx 22\%
+  PF(n, k) = \frac{n!}{(k - 1)!}
 \end{equation}\]</span></p>
-<p>We can check out work with the built-in R <code>dbinom</code>
-function</p>
-<pre class="r"><code>0.22 == round(dbinom(2,24, 0.05), 2)</code></pre>
+<p>It should be noted in the case <span class="math inline">\(k =
+1\)</span> that <span class="math inline">\(PF(n, 1) = n!\)</span></p>
+<pre class="r"><code># Computes &quot;partial&quot; factorial 
+ # E.g., partial_factorial(6, 3) = 6 * 5 * 4 * 3 = 360
+partial_factorial &lt;- function(high, low){
+  m &lt;- low - 1 
+  pf &lt;- factorial(high) / factorial(m)
+  return(pf)
+  
+}
+
+# Test call of above function def
+360 == partial_factorial(6, 3)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>60 == partial_factorial(5, 3)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<ol style="list-style-type: decimal">
+<li>A bag contains 5 green and 7 red jellybeans. How many ways can 5
+jellybeans be withdrawn from the bag so that the number of green ones
+withdrawn will be less than 2?</li>
+</ol>
+<p>There are 2 outcomes in which less than 2 green jellybeans are drawn:
+either 6 or 7 red jellybeans are drawn.</p>
+<pre class="r"><code>jellybeans &lt;- (choose(7, 7) * choose(5, 0)) + (choose(7, 6) * choose(5, 1))
+jellybeans</code></pre>
+<pre><code>## [1] 36</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><em>A certain congressional committee consists of 14 senators and 13
+representatives. How many ways can a subcommittee of 5 be formed if at
+least 4 of the members must be representatives?</em></li>
+</ol>
+<pre class="r"><code>n_reps &lt;- 13
+n_senate &lt;- 14
+members &lt;- n_reps + n_senate
+
+seat_combos &lt;- partial_factorial(13, 10) * (members - 4)
+seat_combos</code></pre>
+<pre><code>## [1] 394680</code></pre>
 <ol start="3" style="list-style-type: decimal">
-<li>(Poisson). You are modeling the family practice clinic and notice
-that patients arrive at a rate of 10 per hour. What is the probability
-that exactly 3 arrive in one hour? What is the probability that more
-than 10 arrive in one hour? How many would you expect to arrive in 8
-hours? What is the standard deviation of the appropriate probability
-distribution? If there are three family practice providers that can see
-24 templated patients each day, what is the percent utilization and what
-are your recommendations?</li>
+<li><em>If a coin is tossed 5 times, and then a standard six-sided die
+is rolled 2 times, and finally a group of three cards are drawn from a
+standard deck of 52 cards without replacement, how many different
+outcomes are possible?</em></li>
 </ol>
-<p>We have <span class="math inline">\(\lambda = 10\)</span> and <span class="math inline">\(k = 3\)</span>. We can plug these values into the
-<a href="https://www.sciencedirect.com/topics/mathematics/poisson-distribution">Poisson
-distribution</a>:</p>
-<p><span class="math display">\[\begin{equation}
-  P(X = k) = \frac{\lambda^k}{k!} \exp{-\lambda}
-\end{equation}\]</span></p>
-<pre class="r"><code>poisson_dist &lt;- function(lambda, k){
-  prob &lt;- exp(-lambda) * (lambda ** k) / (factorial(k))
-  return(prob)
-}
+<p>These are independent events, so we can multiply the number of
+outcomes of each “experiemnt” (dice, coins, card)</p>
+<pre class="r"><code>coin &lt;- 2 ** 5
+dice &lt;- 6 ** 2
+cards &lt;- 52 * 51 * 50
 
-# Probability of exactly 3 in one hour
-poisson_dist(10, 3)</code></pre>
-<pre><code>## [1] 0.007566655</code></pre>
-<p>We can use the above function iteratively to find the probability
-that more than 10 arrvie in one hour</p>
-<pre class="r"><code>avg_rate &lt;- 10 # given lambda
-cumulative_probability &lt;- 0
-for (i in c(1:10)){
-  prob &lt;- poisson_dist(avg_rate, i)
-  cumulative_probability &lt;- cumulative_probability + prob
-}
-
-1 - cumulative_probability</code></pre>
-<pre><code>## [1] 0.4170056</code></pre>
-<p>If the average rate of arrival is 10 per hour, I would expect <span class="math inline">\(8 * 10 = 80\)</span> arrivals in 8 hours. The <a href="https://www.sciencedirect.com/topics/mathematics/poisson-distribution">standard
-deviation of the poison distribution</a> is <span class="math inline">\(\sqrt{\lambda} = \sqrt{10} = 3.16\)</span></p>
+total_outcomes &lt;- coin * dice * cards
+total_outcomes</code></pre>
+<pre><code>## [1] 152755200</code></pre>
 <ol start="4" style="list-style-type: decimal">
-<li>(Hypergeometric). Your subordinate with 30 supervisors was recently
-accused of favoring nurses. 15 of the subordinate’s workers are nurses
-and 15 are other than nurses. As evidence of malfeasance, the accuser
-stated that there were 6 company-paid trips to Disney World for which
-everyone was eligible. The supervisor sent 5 nurses and 1 non-nurse. If
-your subordinate acted innocently, what was the probability he/she would
-have selected five nurses for the trips? How many nurses would we have
-expected your subordinate to send? How many non-nurses would we have
-expected your subordinate to send?</li>
+<li><em>3 cards are drawn from a standard deck without replacement. What
+is the probability that at least one of the cards drawn is a 3? Express
+your answer as a fraction or a decimal number rounded to four decimal
+places.</em></li>
 </ol>
-<p>We can use the hypergeometric distribution:</p>
-<p><span class="math display">\[\begin{equation}
-  h(N, k, n, x) = \frac{{k \choose x}{N - k \choose n - x}}{{N \choose
-n}}
-\end{equation}\]</span></p>
-<p>Plugging in our values of <span class="math inline">\(N = 30, k = 15,
-n = 6, x = 5\)</span>, we get: <span class="math display">\[\begin{equation}
-  h(30, 15, 6, 5) = \frac{{15 \choose 5}{15 \choose 1}}{{30 \choose 6}}
-\approx 0.075
-\end{equation}\]</span></p>
-<p>Assuming no preference for nurses vs non-nurses, I would expect 3
-nurses and non-nurses to be selected, as this reflects the “population”
-of employees more accurately.</p>
-<ol start="5" style="list-style-type: decimal">
-<li>(Geometric). The probability of being seriously injured in a car
-crash in an unspecified location is about .1% per hour. A driver is
-required to traverse this area for 1200 hours in the course of a year.
-What is the probability that the driver will be seriously injured during
-the course of the year? In the course of 15 months? What is the expected
-number of hours that a driver will drive before being seriously injured?
-Given that a driver has driven 1200 hours, what is the probability that
-he or she will be injured in the next 100 hours?</li>
-</ol>
-<p>Geometric distribution:</p>
-<p><span class="math display">\[\begin{equation}
-  P(X = k) = p(1 - p)^{k -1}
-\end{equation}\]</span></p>
-<p>Plugging in our values of <span class="math inline">\(p = 0.001, k =
-1200\)</span>, we get:</p>
-<p><span class="math display">\[\begin{equation}
-  P(X = k) = 0.001 ( 0.999 )^1200 \approx 0.0003
-\end{equation}\]</span></p>
-<p>Over the cours eof 15 months, we adjust our <span class="math inline">\(k\)</span> value (<span class="math inline">\(k =
-1500\)</span>):</p>
-<p><span class="math display">\[\begin{equation}
-  P(X = k) = 0.001 ( 0.999 )^1500 \approx 0.0002
-\end{equation}\]</span></p>
-<p>The <a href="https://en.wikipedia.org/wiki/Geometric_distribution">mean/expected
-value of the geometric distribution</a> is $ Plugging in our
-probability, we get</p>
-<pre class="r"><code>exp_value &lt;- (1 / 0.001)</code></pre>
-<ol start="6" style="list-style-type: decimal">
-<li>You are working in a hospital that is running off of a primary
-generator which fails about once in 1000 hours. What is the probability
-that the generator will fail more than twice in 1000 hours? What is the
-expected value?</li>
-</ol>
-<p>Again, we can use the poisson distribution and our
-<code>poisson_dist</code> function from earlier</p>
-<pre class="r"><code>avg_rate &lt;- 1 # given lambda
-cumulative_probability &lt;- 0
-
-# We want to subract the events where k = 0, 1, or 2 from our sample space
-for (i in c(0:2)){
-  prob &lt;- poisson_dist(avg_rate, i)
-  cumulative_probability &lt;- cumulative_probability + prob
+<pre class="r"><code>n_cards &lt;- 52
+n_success &lt;- 4
+cumulative_probability &lt;- 1
+for (i in 0:2){
+  cumulative_probability &lt;- cumulative_probability * (n_success - i) / (n_cards - 1)
 }
 
-1 - cumulative_probability</code></pre>
-<pre><code>## [1] 0.0803014</code></pre>
-<p>The expected value is 0.001 failures per hour, assuming we take 1
-hour to be our “base unit” of time.</p>
-<ol start="7" style="list-style-type: decimal">
-<li>A surgical patient arrives for surgery precisely at a given time.
-Based on previous analysis (or a lack of knowledge assumption), you know
-that the waiting time is uniformly distributed from 0 to 30 minutes.
-What is the probability that this patient will wait more than 10
-minutes? If the patient has already waited 10 minutes, what is the
-probability that he/she will wait at least another 5 minutes prior to
-being seen? What is the expected waiting time?</li>
+cumulative_probability</code></pre>
+<pre><code>## [1] 0.0001809259</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li><em>Lorenzo is picking out some movies to rent, and he is primarily
+interested in documentaries and mysteries. He has narrowed down his
+selections to 17 documentaries and 14 mysteries.</em></li>
 </ol>
 <ol style="list-style-type: lower-alpha">
-<li>If the distribution is uniform, then the probability the patient
-waits for longer than 10 minutes is <span class="math inline">\(2/3
-\approx 66\%\)</span>.</li>
-<li>If they’ve already waited 10 minutes, we can use the latter two
-thirds of our uniform distribution, which would yield <span class="math inline">\(5/20 = 0.25\)</span></li>
-<li>The expected waiting time is 15 minutes, or the midpoint of our
-uniform distribution from 0 to 30 minutes.</li>
+<li><em>How many different combinations of 5 movies can he rent?</em>
+There are 31 total movies so we can use the <code>choose</code>
+functiont o calculate this number of outcomes</li>
 </ol>
-<p><span class="math display">\[\begin{equation}
-    P(T \ge 15 | T \ge 10) = \frac{P(T \ge 10 | T \ge 15) \cdot P(T \ge
-15)}{P(T \ge 10 | T \ge 15) * P(T \ge 15) + P(T \ge 15 | T \ge 10) \cdot
-P(T &lt; 15)}
-  \end{equation}\]</span></p>
-<p><span class="math display">\[\begin{equation}
-     P(T \geq 15 | T \ge 10) = \frac{0.5}{0.5 + \frac{5}{15} * 0.5} =
-0.75
-  \end{equation}\]</span></p>
-<ol start="8" style="list-style-type: decimal">
-<li>Your hospital owns an old MRI, which has a manufacturer’s lifetime
-of about 10 years (expected value). Based on previous studies, we know
-that the failure of most MRIs obeys an exponential distribution. What is
-the expected failure time? What is the standard deviation? What is the
-probability that your MRI will fail after 8 years? Now assume that you
-have owned the machine for 8 years. Given that you already owned the
-machine 8 years, what is the probability that it will fail in the next
-two years?</li>
-</ol>
-<p>The exponential distribution is given by:</p>
-<p><span class="math display">\[\begin{equation}
-  f(x; \lambda) = \lambda\exp{-\lambda x}
-\end{equation}\]</span></p>
-<p>The expected failure time is 10 years, as that’s the amount of time
-we’d expect a random MRI to last. The <a href="https://en.wikipedia.org/wiki/Exponential_distribution">standard
-deviation of the exponential distribution</a> is equal to the mean, so
-in this case it would be 10.</p>
-<p>For the probability fo failure after 8 years, we can use the R code
-below:</p>
-<pre class="r"><code>lambda &lt;- 0.1
-x &lt;- 8
+<pre class="r"><code>n_movies &lt;- 31
+n_movie_slots &lt;- 5
 
-prob_mri &lt;- lambda * exp(-lambda * x)
-prob_mri</code></pre>
-<pre><code>## [1] 0.0449329</code></pre>
-<p>Given that the <a href="https://en.wikipedia.org/wiki/Exponential_distribution#Memorylessness">exponential
-distribution is memoryless</a>, we can calculate the probability of
-failure in the next 2 years</p>
-<pre class="r"><code>lambda2 &lt;- 0.1
-x2 &lt;- 2
-prob_mri2 &lt;- lambda2 * exp(-lambda2 * x2)
-prob_mri2</code></pre>
-<pre><code>## [1] 0.08187308</code></pre>
+choose(n_movies, n_movie_slots)</code></pre>
+<pre><code>## [1] 169911</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li><em>How many different combinations of 5 movies can he rent if he
+wants at least one mystery?</em></li>
+</ol>
+<p>We can treat the first movie “place” as any of the 14 mysteries. Then
+we can treat it as a selection problem with replacement</p>
+<pre class="r"><code>14* partial_factorial(30, 27)</code></pre>
+<pre><code>## [1] 9208080</code></pre>
+<ol start="6" style="list-style-type: decimal">
+<li><em>In choosing what music to play at a charity fund raising event,
+Cory needs to have an equal number of symphonies from Brahms, Haydn, and
+Mendelssohn. If he is setting up a schedule of the 9 symphonies to be
+played, and he has 4 Brahms, 104 Haydn, and 17 Mendelssohn symphonies
+from which to choose, how many different schedules are possible? Express
+your answer in scientific notation rounding to the hundredths
+place.</em></li>
+</ol>
+<p>We can also treat this problem as selection of 3 places for each
+composer with replacement (since this is a schedule, if he chooses Haydn
+symphony 1 before symphony 2, that would be considered a different
+schedule than the alternative order)</p>
+<p><span class="math display">\[\begin{equation}
+  \underbrace{4 \cdot 3 \cdot 2}_{Brahms}
+\end{equation}\]</span></p>
+<pre class="r"><code>brahms &lt;- 4 * 3 * 2
+haydn &lt;- 104 * 103 * 102
+mendelssohn &lt;- 17 * 16 *15
+composers &lt;- brahms * haydn * mendelssohn
+
+format(composers, digits=3, scientific=TRUE)</code></pre>
+<pre><code>## [1] &quot;1.07e+11&quot;</code></pre>
+<ol start="7" style="list-style-type: decimal">
+<li><em>An English teacher needs to pick 13 books to put on his reading
+list for the next school year, and he needs to plan the order in which
+they should be read. He has narrowed down his choices to 6 novels, 6
+plays, 7 poetry books, and 5 nonfiction books.</em></li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li><em>If he wants to include no more than 4 nonfiction books, how many
+different reading schedules are possible? Express your answer in
+scientific notation rounding to the hundredths place.</em></li>
+</ol>
+<p>There are 13 total “book slots” in the schedule, and 4 spots are
+designated as “non-fiction” slots.</p>
+<p>We can express this with our <code>partial_factorial</code> computing
+the number of non-fiction combinations (9 slots after selection of 4
+non-fiction books) multiplied by the number of non-fiction book
+selections: <span class="math inline">\(5 * 4 * 3 * 2\)</span></p>
+<pre class="r"><code>nonfiction_schedules &lt;- partial_factorial(5, 4) * partial_factorial(20, 12)
+format(nonfiction_schedules, digits=3, scientific=TRUE)</code></pre>
+<pre><code>## [1] &quot;1.22e+12&quot;</code></pre>
+<p><strong>Step 2.</strong> <em>If he wants to include all 6 plays, how
+many different reading schedules are possible? Express your answer in
+scientific notation rounding to the hundredths place.</em></p>
+<pre class="r"><code>all_plays &lt;- factorial(6) * partial_factorial(13, 7)
+format(all_plays, digits=3, scientific=TRUE)</code></pre>
+<pre><code>## [1] &quot;6.23e+09&quot;</code></pre>
+<ol start="8" style="list-style-type: decimal">
+<li><p><em>Zane is planting trees along his driveway, and he has 5
+sycamores and 5 cypress trees to plant in one row. What is the
+probability that he randomly plants the trees so that all 5 sycamores
+are next to each other and all 5 cypress trees are next to each other?
+Express your answer as a fraction or a decimal number rounded to four
+decimal places.</em></p></li>
+<li><p><em>If you draw a queen or lower from a standard deck of cards, I
+will pay you $4. If not, you pay me $16. (Aces are considered the
+highest card in the deck.)</em></p></li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li><em>Find the expected value of the proposition. Round your answer to
+two decimal places. Losses must be expressed as negative values.</em>
+There are 2 outcomes: <code>success</code> (king or ace drawn), or
+<code>failure</code> (queen or lower). We can calculate the expected
+value as the probability of success multiplied by the success payout
+($4) plus the probability of fialure multiplied by the failure “payout”
+(-$16 or a $16 loss)</li>
+</ol>
+<pre class="r"><code>n &lt;- 52
+n_ka &lt;- 8 # number of kings &amp; aces in deck
+
+prob_success &lt;- n_ka / n
+prob_failure &lt;- (n - n_ka) / n
+
+# Calculate expected value
+expected_value &lt;- round((4 * prob_failure) + (-16 * prob_failure), 2)
+expected_value</code></pre>
+<pre><code>## [1] -10.15</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li><em>If you played this game 833 times how much would you expect to
+win or lose? Round your answer to two decimal places. Losses must be
+expressed as negative values.</em></li>
+</ol>
+<p>We can multiply our expected value by the number of trials (<span class="math inline">\(833\)</span>)</p>
+<pre class="r"><code>expected_value * 833</code></pre>
+<pre><code>## [1] -8454.95</code></pre>
 
 
 

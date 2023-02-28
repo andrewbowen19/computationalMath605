@@ -143,7 +143,14 @@ The expected value is 0.001 failures per hour, assuming we take 1 hour to be our
 a) If the distribution is uniform, then the probability the patient waits for longer than 10 minutes is $2/3 \approx 66\%$. 
 b) If they've already waited 10 minutes, we can use the latter two thirds of our uniform distribution, which would yield $5/20 = 0.25$
 c) The expected waiting time is 15 minutes, or the midpoint of our uniform distribution from 0 to 30 minutes.
+  
+  \begin{equation}
+    P(T \ge 15 | T \ge 10) = \frac{P(T \ge 10 | T \ge 15) \cdot P(T \ge 15)}{P(T \ge 10 | T \ge 15) * P(T \ge 15) + P(T \ge 15 | T \ge 10) \cdot P(T < 15)}
+  \end{equation}
 
+  \begin{equation}
+     P(T \geq 15 | T \ge 10) = \frac{0.5}{0.5 + \frac{5}{15} * 0.5} = 0.75
+  \end{equation}
 
 8. Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value). Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution. What is the expected failure time? What is the standard deviation? What is the probability that your MRI will fail after 8 years? Now assume that you have owned the machine for 8 years. Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?
 
