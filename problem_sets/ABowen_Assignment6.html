@@ -365,7 +365,8 @@ display: none;
 
 <p>First, let’s defnie a function that will come in handy. There are
 several points in this assignment in which we multiply in a factorial
-method (e.g., $20 $), but don’t multiply recursively to <span class="math inline">\(1\)</span>. We’ll define a “partial” factorial
+method (e.g., <span class="math inline">\(20 \cdot 19 \cdot 18 \cdot
+\dots\)</span>), but don’t multiply recursively to <span class="math inline">\(1\)</span>. We’ll define a “partial” factorial
 function below multiplying</p>
 <p><span class="math display">\[\begin{equation}
   PF(n, k) = \frac{n!}{(k - 1)!}
@@ -511,15 +512,29 @@ scientific notation rounding to the hundredths place.</em></p>
 format(all_plays, digits=3, scientific=TRUE)</code></pre>
 <pre><code>## [1] &quot;6.23e+09&quot;</code></pre>
 <ol start="8" style="list-style-type: decimal">
-<li><p><em>Zane is planting trees along his driveway, and he has 5
+<li><em>Zane is planting trees along his driveway, and he has 5
 sycamores and 5 cypress trees to plant in one row. What is the
 probability that he randomly plants the trees so that all 5 sycamores
 are next to each other and all 5 cypress trees are next to each other?
 Express your answer as a fraction or a decimal number rounded to four
-decimal places.</em></p></li>
-<li><p><em>If you draw a queen or lower from a standard deck of cards, I
+decimal places.</em></li>
+</ol>
+<p>In the outcome that each tree type is next to each other, we have the
+first 5 places filled by one tree type (say sycamore for this example).
+Since we are using replacement here, the denominator of our
+probabilities changes for each place</p>
+<span class="math display">\[\begin{aligned}
+  P = \frac{5}{10} \cdot \frac{4}{9} \cdot \frac{3}{8} \cdot \frac{2}{7}
+\cdot \frac{1}{6} = 0.0040
+\end{aligned}\]</span>
+<p>Let’s check our calculation with R:</p>
+<pre class="r"><code>trees &lt;- (5/10) * (4/9) * (3/8) * (2/7) * (1/6)
+round(trees, 4)</code></pre>
+<pre><code>## [1] 0.004</code></pre>
+<ol start="9" style="list-style-type: decimal">
+<li><em>If you draw a queen or lower from a standard deck of cards, I
 will pay you $4. If not, you pay me $16. (Aces are considered the
-highest card in the deck.)</em></p></li>
+highest card in the deck.)</em></li>
 </ol>
 <ol style="list-style-type: lower-alpha">
 <li><em>Find the expected value of the proposition. Round your answer to

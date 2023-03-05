@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 1.  (Bayesian). A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1 (HIV-1) variants was recently developed. The test maintains 96% sensitivity, meaning that, for those with the disease, it will correctly report “positive” for 96% of them. The test is also 98% specific, meaning that, for those without the disease, 98% will be correctly reported as “negative.” MNR HIV-1 is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate. Given the prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is reported as positive by the new test actually has the disease? If the median cost (consider this the best point estimate) is about $100,000 per positive case total and the test itself costs \$1000 per administration, what is the total first-year cost for treating 100,000 individuals?
 
 
-We can use Bayes' rule to solve for the posteriro here:
+We can use Bayes' rule to solve for the posterior here:
 
 \begin{aligned}
   P(disease | positive) = \frac{P(disease)P(positive | disease)}{P(positive)}
