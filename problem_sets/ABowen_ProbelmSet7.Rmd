@@ -1,0 +1,103 @@
+---
+title: 'DATA605: Problem Set 7'
+author: "Andrew Bowen"
+date: "2023-03-07"
+output: html_document
+---
+
+```{r, message=FALSE}
+library(glue)
+```
+
+# Question 1
+
+
+
+# Question 2
+
+
+## 2a
+
+We'll use the geometric distribution `dgeom` here to find the probability of failure after 8 years, igven the probability of failing in a given year is 0.1
+```{r 2a}
+p_fail <- 0.1 # probability of failure in given year
+n <- 8
+
+(prob_fail_8 <- dgeom(n, p_fail))
+```
+
+Now let's find the [expected value and variance of this geometric distribution](https://en.wikipedia.org/wiki/Geometric_distribution#Properties)
+```{r exp-value-var-2a}
+exp_value <- 1 / p_fail
+
+v <- (1 - p_fail) / p_fail**2
+sigma <- sqrt(v)
+
+print(glue("Expected Value: {exp_value}"))
+print(glue("Std Dev: {sigma}"))
+```
+
+
+## 2b - Exponential Distribution
+Using the exponential distribution (R's built-in `dexp` function as a probability density), we can model the probability of machine failure after 8 years
+```{r exponential}
+# Probability of failure after 8 years (exponential)
+(p_fail_exp <- dexp(n, rate=p_fail))
+```
+
+The [expected value and variance of an exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution#Properties) is based on the *rate parameter $\lambda$. In this case our average rate of failure for the machine is 1 failure every 10 years, or a rate of 0.1 failures per year
+
+```{r}
+exp_value_exp <- 1 / p_fail
+var_exp <- 1 / (p_fail ** 2)
+std_exp <- sqrt(var_exp)
+
+
+print(glue("Expected Value (exponential): {exp_value_exp}"))
+print(glue("Std Dev (exponential): {std_exp}"))
+```
+
+
+## 2c - Binomial Distribution
+Similar to above, we can use R's `dbinom` 
+```{r binomial}
+(p_fail_binom <- dbinom(0, n, p_fail))
+```
+
+The expected value and variance of the binomal distribution can be [found here](https://en.wikipedia.org/wiki/Binomial_distribution#Properties). Assuming $n$ is the number of trials (years) and p is the probability of each trial resulting in a "success" (in this case the machine failing is a "success" with our setup, even though the language may be confusing)
+
+
+\begin{aligned}
+  E(X) = np
+\end{aligned}
+
+\begin{aligned}
+  Var(X) = npq = np(1 - p)
+\end{aligned}
+
+
+```{r}
+# Calculateing expected value, variance and std dev of binomial distribution
+exp_value_binom <- n * p_fail
+var_binom <- n * p_fail * (1 - p_fail)
+std_binom <- sqrt(var_binom)
+
+
+print(glue("Expected Value (exponential): {exp_value_binom}"))
+print(glue("Std Dev: {std_binom}"))
+```
+
+
+## 2d - Poisson Distribution
+Again, we can use the built-in `dpois` function to find the probability of failure after 8 years
+```{r poisson}
+lambda <- 0.1
+(p_fail_poisson <- dpois(8, lambda))
+```
+
+For poisson distribution, the [expected value and variance are both equal to $\lambda$.](https://en.wikipedia.org/wiki/Poisson_distribution#Properties). In this case that means they are both equal to $\lambda=0.1$ as that is the average rate of machine failure in a given year
+
+
+
+
+

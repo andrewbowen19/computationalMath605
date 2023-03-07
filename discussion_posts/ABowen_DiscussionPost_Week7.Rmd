@@ -1,0 +1,123 @@
+---
+title: 'DATA605: Discussion Post Week 7'
+author: "Andrew Bowen"
+date: "2023-03-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+library(dplyr)
+```
+
+## DATA605: Discussion Post Week 7
+***Exercise 3.2.6**: A die is rolled twice. Let X denote the sum of the two numbers that turn up, and Y the difference of the numbers (specifically, the number on the first roll minus the number on the second). Show that E(XY ) = E(X)E(Y ). Are X and Y independent?*
+
+Let's define some global variables:
+```{r global-vars}
+omega <- expand.grid(1:6, 1:6)
+n_omega <- nrow(omega)
+face_vals <- seq(1:6)
+
+# Getting all combinations of rolls, as well as their sums & diffs
+combos <- omega %>%
+            rename(die1=Var1) %>%
+            rename(die2=Var2) %>%
+            mutate(sum=die1 + die2) %>%
+            mutate(diff=die1 - die2)
+```
+
+First, let's calculate the expected value of $X$, our sum of the two numbers of the dice roll. We define our sample space for the random variable $X$ to be:
+
+\begin{aligned}
+  \Omega_X = \{x | 2 \le x \le 12\}
+\end{aligned}
+
+Let's calculate this expected value (`exp_x`) with the below R code. We'll generate our sampel space $\Omega_X$ via the [built-in R function `expand.grid`](https://www.tutorialspoint.com/how-to-create-sample-space-of-throwing-two-dices-in-r)
+```{r exp-X}
+# First, let's loop over the possible values of X
+omega_x <- range(2:12)
+
+# Getting counts (frequencies of each sum in our sample space)
+sum_counts <- combos %>%
+              count(sum)
+
+exp_x <- 0
+for (x in 2:12){
+  # Get count of outcomes with given sum
+  count_x <- sum_counts %>%
+              filter(sum == x) %>% 
+              pull(n)
+  
+  # Calculate probability of that outcome, add to expected value sum
+  prob <- x * (count_x / n_omega)
+  exp_x <- exp_x + prob
+}
+
+print(exp_x)
+```
+
+
+Next, let's define our sample space for Y. This is the possible values that the random variable Y could take as the *difference* of our two dice rolls
+
+\begin{aligned}
+  \Omega_Y = \{x | -5 \le x \le 5\}
+\end{aligned}
+
+We can take a similar approach as above, but with a slightly different sample space
+```{r exp-Y}
+# First, let's loop over the possible values of X
+omega_y <- range(-5:5)
+
+# Getting counts (frequencies of each sum in our sample space)
+diff_counts <- combos %>%
+                count(diff)
+
+exp_y <- 0
+for (y in -5:5){
+  # Get count of outcomes with given sum
+  count_y <- diff_counts %>%
+              filter(diff == y) %>% 
+              pull(n)
+  
+  # Calculate probability of that outcome, add to expected value sum
+  prob <- y * (count_y / n_omega)
+  exp_y <- exp_y + prob
+}
+
+print(exp_y)
+```
+
+So based on the above, we get $E(X)E(Y) = 7 \cdot 0 = 0$ as the value for $E(Y)$ above is 0 due to a floating point error.
+
+```{r}
+(exp_x * exp_y)
+```
+
+Now we need to calculate $E(XY)$ and show that it is equal to zero to complete our proof. We can do a similar method above, using the sample space of the product of X and Y as our "new" random variable over which we can calculate the expected value.
+```{r exp-value}
+# Let's define our product of X and Y column first in our combos df
+combos <- combos %>%
+  mutate(XY = sum * diff)
+
+omega_xy <- min(combos['XY']) : max(combos['XY'])
+
+exp <- 0
+for (i in omega_xy){
+  # Get count of outcomes with given sum
+  cnt <- diff_counts %>%
+              filter(diff == i) %>% 
+              pull(n)
+  
+  # Calculate probability of that outcome, add to expected value sum
+  prob <- i * (cnt / n_omega)
+  exp <- exp + prob
+}
+
+print(exp)
+```
+
+We're seeing here that $E(XY) =0$ as well, which holds from our result above for $E(X)E(Y) = 0$. The random variables X and Y are independent, since the roll of each die is independent from each other. In other words, you can't predict Y from the outcome of X alone, and vice versa, so X and Y are indpenent random variables. Also, the fact that their expected values observe this theorem adds to the case of them being independent.
