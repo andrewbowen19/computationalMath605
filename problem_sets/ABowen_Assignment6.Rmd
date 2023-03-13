@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-First, let's defnie a function that will come in handy. There are several points in this assignment in which we multiply in a factorial method (e.g., $20 \cdot 19 \cdot 18 \cdot \dots$), but don't multiply recursively to $1$. We'll define a "partial" factorial function below multiplying 
+First, let's define a function that will come in handy. There are several points in this assignment in which we multiply in a factorial method (e.g., $20 \cdot 19 \cdot 18 \cdot \dots$), but don't multiply recursively to $1$. We'll define a "partial" factorial function below multiplying 
 
 \begin{equation}
   PF(n, k) = \frac{n!}{(k - 1)!}

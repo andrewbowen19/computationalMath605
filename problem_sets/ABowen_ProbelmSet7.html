@@ -366,6 +366,36 @@ display: none;
 <pre class="r"><code>library(glue)</code></pre>
 <div id="question-1" class="section level1">
 <h1>Question 1</h1>
+<p>Since each random variable <span class="math inline">\(X_i\)</span>
+can take values from <span class="math inline">\(1, 2, \dots k\)</span>,
+and there are <span class="math inline">\(n\)</span> random variables
+from which Y could be derived, there are <span class="math inline">\(k^n\)</span> possible values for <span class="math inline">\(Y = min(X_1, X2, \dots, X_n)\)</span>.
+Additionally, since we know that each random variable <span class="math inline">\(X_i\)</span> are independent, we can multiply
+their probabilities.</p>
+<p>Since our uniform distribution is over the integers, we can find the
+probability distribution of <span class="math inline">\(Y =
+min(X_i)\)</span> in the window between <span class="math inline">\(Y =
+y\)</span> and <span class="math inline">\(Y = y-1\)</span>: <span class="math inline">\(P(Y = y) = P(Y \le y) - P(Y \le y -
+1)\)</span></p>
+<span class="math display">\[\begin{aligned}
+  P(Y \le y) = 1 - P(Y \ge y)
+             = 1 - P(min(X_i) \ge y)
+             = 1 - \prod_{i = 1}^{n} P(X_i = y)
+             = 1 - \frac{(k - y)^n}{k^n}
+             
+\end{aligned}\]</span>
+<p>We can plug in <span class="math inline">\(y-1\)</span> for <span class="math inline">\(y\)</span> in the above definition to find our
+distribution for <span class="math inline">\(Y\)</span>:</p>
+<span class="math display">\[\begin{aligned}
+  P(Y \le y - 1) = 1 - \frac{(k - (y - 1))^n}{k^n} = 1 - \frac{(k - y +
+1)^n}{k^n}
+\end{aligned}\]</span>
+<p>So we’re left with our final distribution for <span class="math inline">\(Y\)</span>:</p>
+<span class="math display">\[\begin{aligned}
+  P(Y = y) = P(Y \le y) - P(Y \le y - 1) = 1 - \frac{(k - y )^n}{k^n} -
+1 + \frac{(k - y + 1)^n}{k^n}
+           = \frac{(k - y + 1)^n - (k -y)^n}{k^n}
+\end{aligned}\]</span>
 </div>
 <div id="question-2" class="section level1">
 <h1>Question 2</h1>

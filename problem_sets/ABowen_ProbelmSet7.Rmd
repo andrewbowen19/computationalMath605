@@ -11,7 +11,31 @@ library(glue)
 
 # Question 1
 
+Since each random variable $X_i$ can take values from $1, 2, \dots k$, and there are $n$ random variables from which Y could be derived, there are $k^n$ possible values for $Y = min(X_1, X2, \dots, X_n)$. Additionally, since we know that each random variable $X_i$ are independent, we can multiply their probabilities.
 
+Since our uniform distribution is over the integers, we can find the probability distribution of $Y = min(X_i)$ in the window between $Y = y$ and $Y = y-1$: $P(Y = y) = P(Y \le y) - P(Y \le y - 1)$
+
+
+\begin{aligned}
+  P(Y \le y) = 1 - P(Y \ge y)
+             = 1 - P(min(X_i) \ge y)
+             = 1 - \prod_{i = 1}^{n} P(X_i = y)
+             = 1 - \frac{(k - y)^n}{k^n}
+             
+\end{aligned}
+
+We can plug in $y-1$ for $y$ in the above definition to find our distribution for $Y$:
+
+\begin{aligned}
+  P(Y \le y - 1) = 1 - \frac{(k - (y - 1))^n}{k^n} = 1 - \frac{(k - y + 1)^n}{k^n} 
+\end{aligned}
+
+So we're left with our final distribution for $Y$:
+
+\begin{aligned}
+  P(Y = y) = P(Y \le y) - P(Y \le y - 1) = 1 - \frac{(k - y )^n}{k^n} - 1 + \frac{(k - y + 1)^n}{k^n} 
+           = \frac{(k - y + 1)^n - (k -y)^n}{k^n} 
+\end{aligned}
 
 # Question 2
 
