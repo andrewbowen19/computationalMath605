@@ -35,7 +35,7 @@ partial_factorial <- function(high, low){
 
 There are 2 outcomes in which less than 2 green jellybeans are drawn: either 6 or 7 red jellybeans are drawn. 
 ```{r jellybeans}
-jellybeans <- (choose(7, 7) * choose(5, 0)) + (choose(7, 6) * choose(5, 1))
+jellybeans <- (choose(7, 7) * choose(5, 0)) + (choose(7, 4))
 jellybeans
 ```
 
@@ -46,7 +46,7 @@ n_reps <- 13
 n_senate <- 14
 members <- n_reps + n_senate
 
-seat_combos <- partial_factorial(13, 10) * (members - 4)
+seat_combos <- choose(n_reps, 5) + (choose(n_reps, 4) * choose(n_senate, 1))
 seat_combos
 ```
 

@@ -394,7 +394,7 @@ withdrawn will be less than 2?</li>
 </ol>
 <p>There are 2 outcomes in which less than 2 green jellybeans are drawn:
 either 6 or 7 red jellybeans are drawn.</p>
-<pre class="r"><code>jellybeans &lt;- (choose(7, 7) * choose(5, 0)) + (choose(7, 6) * choose(5, 1))
+<pre class="r"><code>jellybeans &lt;- (choose(7, 7) * choose(5, 0)) + (choose(7, 4))
 jellybeans</code></pre>
 <pre><code>## [1] 36</code></pre>
 <ol start="2" style="list-style-type: decimal">
@@ -406,9 +406,9 @@ least 4 of the members must be representatives?</em></li>
 n_senate &lt;- 14
 members &lt;- n_reps + n_senate
 
-seat_combos &lt;- partial_factorial(13, 10) * (members - 4)
+seat_combos &lt;- choose(n_reps, 5) + (choose(n_reps, 4) * choose(n_senate, 1))
 seat_combos</code></pre>
-<pre><code>## [1] 394680</code></pre>
+<pre><code>## [1] 11297</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li><em>If a coin is tossed 5 times, and then a standard six-sided die
 is rolled 2 times, and finally a group of three cards are drawn from a
