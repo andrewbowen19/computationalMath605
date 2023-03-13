@@ -42,7 +42,7 @@ So we're left with our final distribution for $Y$:
 
 ## 2a
 
-We'll use the geometric distribution `dgeom` here to find the probability of failure after 8 years, igven the probability of failing in a given year is 0.1
+We'll use the geometric distribution `dgeom` here to find the probability of failure after 8 years, given the probability of failing in a given year is 0.1
 ```{r 2a}
 p_fail <- 0.1 # probability of failure in given year
 n <- 8

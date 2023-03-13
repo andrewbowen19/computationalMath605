@@ -64,15 +64,10 @@ total_outcomes
 ```
 
 4. *3 cards are drawn from a standard deck without replacement. What is the probability that at least one of the cards drawn is a 3? Express your answer as a fraction or a decimal number rounded to four decimal places.*
-```{r card-probability}
-n_cards <- 52
-n_success <- 4
-cumulative_probability <- 1
-for (i in 0:2){
-  cumulative_probability <- cumulative_probability * (n_success - i) / (n_cards - 1)
-}
 
-cumulative_probability
+Updating this to use the complement calculation. In essence, what are the chances that we draw **no** three-cards? Then subract that probability from one. For each trial, we start with 48 successes, and then de-increment the numerator and denominator, because we are not replacing cards
+```{r card-probability}
+(card_prob <- 1 - ((48 / 52) * (47/51) * (47/52)))
 ```
 
 5. *Lorenzo is picking out some movies to rent, and he is primarily interested in documentaries and mysteries. He has narrowed down his selections to 17 documentaries and 14 mysteries.*
@@ -135,10 +130,10 @@ format(all_plays, digits=3, scientific=TRUE)
 8. *Zane is planting trees along his driveway, and he has 5 sycamores and 5 cypress trees to plant in one row. What is the probability that he randomly plants the trees so that all 5 sycamores are next to each other and all 5 cypress trees are next to each other? Express your answer as a fraction or a decimal number rounded to four decimal places.*
 
 
-In the outcome that each tree type is next to each other, we have the first 5 places filled by one tree type (say sycamore for this example). Since we are using replacement here, the denominator of our probabilities changes for each place
+In the outcome that each tree type is next to each other, we have the first 5 places filled by one tree type (say sycamore for this example). Since we are using replacement here, the denominator of our probabilities changes for each place/ The first place doesn't affect the probability, as it could be either a sycamore tree or a cypress tree, but needs to be followed by 4 trees of the same type
 
 \begin{aligned}
-  P = \frac{5}{10} \cdot \frac{4}{9} \cdot \frac{3}{8} \cdot \frac{2}{7} \cdot \frac{1}{6} = 0.0040
+  P =  \frac{4}{9} \cdot \frac{3}{8} \cdot \frac{2}{7} \cdot \frac{1}{6} = 0.0080
 \end{aligned}
 
 Let's check our calculation with R:
@@ -152,17 +147,15 @@ round(trees, 4)
 pay me \$16. (Aces are considered the highest card in the deck.)*
 
   a. *Find the expected value of the proposition. Round your answer to two decimal places. Losses must be expressed as negative values.*
-There are 2 outcomes: `success` (king or ace drawn), or `failure` (queen or lower). We can calculate the expected value as the probability of success multiplied by the success payout (\$4) plus the probability of fialure multiplied by the failure "payout" (-\$16 or a \$16 loss)
+There are 2 outcomes: `success` (king or ace drawn), or `failure` (queen or lower). We can calculate the expected value as the probability of success multiplied by the success payout (\$4) plus the probability of failure multiplied by the failure "payout" (-\$16 or a \$16 loss)
 ```{r}
-n <- 52
-n_ka <- 8 # number of kings & aces in deck
-
-prob_success <- n_ka / n
-prob_failure <- (n - n_ka) / n
+prob_failure <- 8 / 52
+prob_success <- 44 / 52
+p <- (4 * prob_success) - (16 * prob_failure)
 
 # Calculate expected value
-expected_value <- round((4 * prob_failure) + (-16 * prob_failure), 2)
-expected_value
+expected_value <- round(p, 2)
+print(expected_value)
 ```
 
   b. *If you played this game 833 times how much would you expect to win or lose? Round your answer to two decimal places. Losses must be expressed as negative values.*

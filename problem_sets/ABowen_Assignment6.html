@@ -430,15 +430,13 @@ is the probability that at least one of the cards drawn is a 3? Express
 your answer as a fraction or a decimal number rounded to four decimal
 places.</em></li>
 </ol>
-<pre class="r"><code>n_cards &lt;- 52
-n_success &lt;- 4
-cumulative_probability &lt;- 1
-for (i in 0:2){
-  cumulative_probability &lt;- cumulative_probability * (n_success - i) / (n_cards - 1)
-}
-
-cumulative_probability</code></pre>
-<pre><code>## [1] 0.0001809259</code></pre>
+<p>Updating this to use the complement calculation. In essence, what are
+the chances that we draw <strong>no</strong> three-cards? Then subract
+that probability from one. For each trial, we start with 48 successes,
+and then de-increment the numerator and denominator, because we are not
+replacing cards</p>
+<pre class="r"><code>(card_prob &lt;- 1 - ((48 / 52) * (47/51) * (47/52)))</code></pre>
+<pre><code>## [1] 0.2311173</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li><em>Lorenzo is picking out some movies to rent, and he is primarily
 interested in documentaries and mysteries. He has narrowed down his
@@ -522,10 +520,12 @@ decimal places.</em></li>
 <p>In the outcome that each tree type is next to each other, we have the
 first 5 places filled by one tree type (say sycamore for this example).
 Since we are using replacement here, the denominator of our
-probabilities changes for each place</p>
+probabilities changes for each place/ The first place doesn’t affect the
+probability, as it could be either a sycamore tree or a cypress tree,
+but needs to be followed by 4 trees of the same type</p>
 <span class="math display">\[\begin{aligned}
-  P = \frac{5}{10} \cdot \frac{4}{9} \cdot \frac{3}{8} \cdot \frac{2}{7}
-\cdot \frac{1}{6} = 0.0040
+  P =  \frac{4}{9} \cdot \frac{3}{8} \cdot \frac{2}{7} \cdot \frac{1}{6}
+= 0.0080
 \end{aligned}\]</span>
 <p>Let’s check our calculation with R:</p>
 <pre class="r"><code>trees &lt;- (5/10) * (4/9) * (3/8) * (2/7) * (1/6)
@@ -542,19 +542,17 @@ two decimal places. Losses must be expressed as negative values.</em>
 There are 2 outcomes: <code>success</code> (king or ace drawn), or
 <code>failure</code> (queen or lower). We can calculate the expected
 value as the probability of success multiplied by the success payout
-($4) plus the probability of fialure multiplied by the failure “payout”
+($4) plus the probability of failure multiplied by the failure “payout”
 (-$16 or a $16 loss)</li>
 </ol>
-<pre class="r"><code>n &lt;- 52
-n_ka &lt;- 8 # number of kings &amp; aces in deck
-
-prob_success &lt;- n_ka / n
-prob_failure &lt;- (n - n_ka) / n
+<pre class="r"><code>prob_failure &lt;- 8 / 52
+prob_success &lt;- 44 / 52
+p &lt;- (4 * prob_success) - (16 * prob_failure)
 
 # Calculate expected value
-expected_value &lt;- round((4 * prob_failure) + (-16 * prob_failure), 2)
-expected_value</code></pre>
-<pre><code>## [1] -10.15</code></pre>
+expected_value &lt;- round(p, 2)
+print(expected_value)</code></pre>
+<pre><code>## [1] 0.92</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li><em>If you played this game 833 times how much would you expect to
 win or lose? Round your answer to two decimal places. Losses must be
@@ -562,7 +560,7 @@ expressed as negative values.</em></li>
 </ol>
 <p>We can multiply our expected value by the number of trials (<span class="math inline">\(833\)</span>)</p>
 <pre class="r"><code>expected_value * 833</code></pre>
-<pre><code>## [1] -8454.95</code></pre>
+<pre><code>## [1] 766.36</code></pre>
 
 
 
