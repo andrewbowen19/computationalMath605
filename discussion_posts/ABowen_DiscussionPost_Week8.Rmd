@@ -1,0 +1,114 @@
+---
+title: 'DATA605: Discussion Post Week 7'
+author: "Andrew Bowen"
+date: "2023-03-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Probability Exercise 7.1.3
+
+**Question:** Let $X_1$ and $X_2$ be independent random variables with common distribution
+
+\begin{aligned}
+  p_X = \begin{pmatrix}
+          0 & 1 & 2 \\
+          \frac{1}{8} & \frac{3}{8} & \frac{1}{2}
+        \end{pmatrix}
+\end{aligned}
+
+Find the distribution of the sum $Z = X_1 + X_2$
+
+
+## Solution
+
+We can build off the method used in example 7.1 here. We can use the convolution of the above distribution to find the probability distribution for each sum value that Z can take: $z \in \{0, 1, 2, 3, 4\}$. We'll follow the book's notation and let $m(x) = p_X \forall x \in \{0,1,2\}$
+
+
+#### Z = 0
+In the case that $Z = 0$ both $X_1$ and $X_2$ are 0. We can take the below convolution:
+
+\begin{aligned}
+  P(Z = 0) = p_X(0) \cdot p_X(0) = \frac{1}{8} \cdot \frac{1}{8} = \frac{1}{64}
+\end{aligned}
+
+```{r}
+p0 <- 1/8 * 1/8
+
+1/64 == p0
+```
+
+
+
+#### Z = 1
+This outcome could occur when either $X_1 = 0$, and $X_2 = 1$, or vice versa. We can take the convolution below to get the probability of the outcome $Z=1$
+
+\begin{aligned}
+  P(Z = 1) = m(0)m(1) + m(1)m(0)
+           = \frac{1}{8}\frac{3}{8} + \frac{3}{8}\frac{1}{8}
+           = \frac{6}{64}
+\end{aligned}
+
+```{r}
+p1 <- (1/8 * 3/8) + (3/8 * 1/8)
+
+6/64 == p1
+```
+
+#### Z = 2
+This outcome could occur when either both $X_1, X_2 = 1$, $X_1 = 0$, and $X_2 = 2$, or vice versa. We can take the convolution below to get the probability of the outcome $Z=2$
+
+\begin{aligned}
+  P(Z = 2) = m(0)m(2) + m(1)m(1) + m(2)m(0)
+           = \frac{1}{8}\frac{1}{2} + \frac{3}{8}\frac{3}{8}  + \frac{1}{2}\frac{1}{8}
+           = \frac{17}{64}
+\end{aligned}
+
+Checking our math with the R code below
+```{r}
+p2 <- (1/8 * 1/2) + (3/8 * 3/8) + (1/2 * 1/8)
+
+17/64 == p2
+```
+
+#### Z = 3
+This outcome can only occur when $X_1 = 1$ and $X_2 = 2$, or vice versa. Neither "input" random variable can take the value 0 and have $Z=3$, as it's their sum. We can take the convolution to ge $Z$'s distribtuion function's value for $Z=3$
+
+\begin{aligned}
+  P(Z = 3) = m(1)m(2) + m(2)m(1)
+           = \frac{3}{8}\frac{1}{2} + \frac{1}{2}\frac{3}{8}
+           = \frac{24}{64}
+\end{aligned}
+
+Check our math for the $Z=3$ case:
+```{r}
+p3 <- (3/8 * 1/2) + (1/2 * 3/8)
+
+24/64 == p3
+```
+
+#### Z = 4
+Finally, this outcome only occurs when both $X_1$ and $X_2$ both are equal to 2. We can get the convolution from the probability distributions for each random variable being equal to 2 multiplied together (because $X_1$ and $X_2$ are independent):
+
+\begin{aligned}
+  P(Z = 4) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4} = \frac{16}{64}
+\end{aligned}
+
+```{r}
+p4 <- (1/2 * 1/2)
+
+16/64 == p4
+```
+
+### Check
+Finally, we can check our work that our probability distribution (sum of each discrete distribution value above) sums to 1:
+
+```{r}
+probability_sum <- p0 + p1 + p2 + p3 + p4
+
+1.0 == probability_sum
+```
+

@@ -11,9 +11,9 @@
 
 <meta name="author" content="Andrew Bowen" />
 
-<meta name="date" content="2023-02-27" />
+<meta name="date" content="2023-03-15" />
 
-<title>DATA605 Problem Set 6</title>
+<title>DATA605: Discussion Post Week 7</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -356,211 +356,122 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">DATA605 Problem Set 6</h1>
+<h1 class="title toc-ignore">DATA605: Discussion Post Week 7</h1>
 <h4 class="author">Andrew Bowen</h4>
-<h4 class="date">2023-02-27</h4>
+<h4 class="date">2023-03-15</h4>
 
 </div>
 
 
-<p>First, let’s define a function that will come in handy. There are
-several points in this assignment in which we multiply in a factorial
-method (e.g., <span class="math inline">\(20 \cdot 19 \cdot 18 \cdot
-\dots\)</span>), but don’t multiply recursively to <span class="math inline">\(1\)</span>. We’ll define a “partial” factorial
-function below multiplying</p>
-<p><span class="math display">\[\begin{equation}
-  PF(n, k) = \frac{n!}{(k - 1)!}
-\end{equation}\]</span></p>
-<p>It should be noted in the case <span class="math inline">\(k =
-1\)</span> that <span class="math inline">\(PF(n, 1) = n!\)</span></p>
-<pre class="r"><code># Computes &quot;partial&quot; factorial 
- # E.g., partial_factorial(6, 3) = 6 * 5 * 4 * 3 = 360
-partial_factorial &lt;- function(high, low){
-  m &lt;- low - 1 
-  pf &lt;- factorial(high) / factorial(m)
-  return(pf)
-  
-}
-
-# Test call of above function def
-360 == partial_factorial(6, 3)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>60 == partial_factorial(5, 3)</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<ol style="list-style-type: decimal">
-<li>A bag contains 5 green and 7 red jellybeans. How many ways can 5
-jellybeans be withdrawn from the bag so that the number of green ones
-withdrawn will be less than 2?</li>
-</ol>
-<p>There are 2 outcomes in which less than 2 green jellybeans are drawn:
-either 6 or 7 red jellybeans are drawn.</p>
-<pre class="r"><code>jellybeans &lt;- (choose(7, 7) * choose(5, 0)) + (choose(7, 4))
-jellybeans</code></pre>
-<pre><code>## [1] 36</code></pre>
-<ol start="2" style="list-style-type: decimal">
-<li><em>A certain congressional committee consists of 14 senators and 13
-representatives. How many ways can a subcommittee of 5 be formed if at
-least 4 of the members must be representatives?</em></li>
-</ol>
-<pre class="r"><code>n_reps &lt;- 13
-n_senate &lt;- 14
-members &lt;- n_reps + n_senate
-
-seat_combos &lt;- choose(n_reps, 5) + (choose(n_reps, 4) * choose(n_senate, 1))
-seat_combos</code></pre>
-<pre><code>## [1] 11297</code></pre>
-<ol start="3" style="list-style-type: decimal">
-<li><em>If a coin is tossed 5 times, and then a standard six-sided die
-is rolled 2 times, and finally a group of three cards are drawn from a
-standard deck of 52 cards without replacement, how many different
-outcomes are possible?</em></li>
-</ol>
-<p>These are independent events, so we can multiply the number of
-outcomes of each “experiemnt” (dice, coins, card)</p>
-<pre class="r"><code>coin &lt;- 2 ** 5
-dice &lt;- 6 ** 2
-cards &lt;- 52 * 51 * 50
-
-total_outcomes &lt;- coin * dice * cards
-total_outcomes</code></pre>
-<pre><code>## [1] 152755200</code></pre>
-<ol start="4" style="list-style-type: decimal">
-<li><em>3 cards are drawn from a standard deck without replacement. What
-is the probability that at least one of the cards drawn is a 3? Express
-your answer as a fraction or a decimal number rounded to four decimal
-places.</em></li>
-</ol>
-<p>Updating this to use the complement calculation. In essence, what are
-the chances that we draw <strong>no</strong> three-cards? Then subract
-that probability from one. For each trial, we start with 48 successes,
-and then de-increment the numerator and denominator, because we are not
-replacing cards</p>
-<pre class="r"><code>(card_prob &lt;- 1 - ((48 / 52) * (47/51) * (47/52)))</code></pre>
-<pre><code>## [1] 0.2311173</code></pre>
-<ol start="5" style="list-style-type: decimal">
-<li><em>Lorenzo is picking out some movies to rent, and he is primarily
-interested in documentaries and mysteries. He has narrowed down his
-selections to 17 documentaries and 14 mysteries.</em></li>
-</ol>
-<ol style="list-style-type: lower-alpha">
-<li><em>How many different combinations of 5 movies can he rent?</em>
-There are 31 total movies so we can use the <code>choose</code> function
-to calculate this number of outcomes</li>
-</ol>
-<pre class="r"><code>n_movies &lt;- 31
-n_movie_slots &lt;- 5
-
-choose(n_movies, n_movie_slots)</code></pre>
-<pre><code>## [1] 169911</code></pre>
-<ol start="2" style="list-style-type: lower-alpha">
-<li><em>How many different combinations of 5 movies can he rent if he
-wants at least one mystery?</em></li>
-</ol>
-<p>We can treat the first movie “place” as any of the 14 mysteries. Then
-we can treat it as a selection problem with replacement</p>
-<pre class="r"><code>14 * partial_factorial(30, 27)</code></pre>
-<pre><code>## [1] 9208080</code></pre>
-<ol start="6" style="list-style-type: decimal">
-<li><em>In choosing what music to play at a charity fund raising event,
-Cory needs to have an equal number of symphonies from Brahms, Haydn, and
-Mendelssohn. If he is setting up a schedule of the 9 symphonies to be
-played, and he has 4 Brahms, 104 Haydn, and 17 Mendelssohn symphonies
-from which to choose, how many different schedules are possible? Express
-your answer in scientific notation rounding to the hundredths
-place.</em></li>
-</ol>
-<p>We can also treat this problem as selection of 3 places for each
-composer with replacement (since this is a schedule, if he chooses Haydn
-symphony 1 before symphony 2, that would be considered a different
-schedule than the alternative order)</p>
-<p><span class="math display">\[\begin{equation}
-  \underbrace{4 \cdot 3 \cdot 2}_{Brahms}
-\end{equation}\]</span></p>
-<pre class="r"><code>brahms &lt;- 4 * 3 * 2
-haydn &lt;- 104 * 103 * 102
-mendelssohn &lt;- 17 * 16 *15
-composers &lt;- brahms * haydn * mendelssohn
-
-format(composers, digits=3, scientific=TRUE)</code></pre>
-<pre><code>## [1] &quot;1.07e+11&quot;</code></pre>
-<ol start="7" style="list-style-type: decimal">
-<li><em>An English teacher needs to pick 13 books to put on his reading
-list for the next school year, and he needs to plan the order in which
-they should be read. He has narrowed down his choices to 6 novels, 6
-plays, 7 poetry books, and 5 nonfiction books.</em></li>
-</ol>
-<ol style="list-style-type: lower-alpha">
-<li><em>If he wants to include no more than 4 nonfiction books, how many
-different reading schedules are possible? Express your answer in
-scientific notation rounding to the hundredths place.</em></li>
-</ol>
-<p>There are 13 total “book slots” in the schedule, and 4 spots are
-designated as “non-fiction” slots.</p>
-<p>We can express this with our <code>partial_factorial</code> computing
-the number of non-fiction combinations (9 slots after selection of 4
-non-fiction books) multiplied by the number of non-fiction book
-selections: <span class="math inline">\(5 * 4 * 3 * 2\)</span></p>
-<pre class="r"><code>nonfiction_schedules &lt;- partial_factorial(5, 4) * partial_factorial(20, 12)
-format(nonfiction_schedules, digits=3, scientific=TRUE)</code></pre>
-<pre><code>## [1] &quot;1.22e+12&quot;</code></pre>
-<p><strong>Step 2.</strong> <em>If he wants to include all 6 plays, how
-many different reading schedules are possible? Express your answer in
-scientific notation rounding to the hundredths place.</em></p>
-<pre class="r"><code>all_plays &lt;- factorial(6) * partial_factorial(13, 7)
-format(all_plays, digits=3, scientific=TRUE)</code></pre>
-<pre><code>## [1] &quot;6.23e+09&quot;</code></pre>
-<ol start="8" style="list-style-type: decimal">
-<li><em>Zane is planting trees along his driveway, and he has 5
-sycamores and 5 cypress trees to plant in one row. What is the
-probability that he randomly plants the trees so that all 5 sycamores
-are next to each other and all 5 cypress trees are next to each other?
-Express your answer as a fraction or a decimal number rounded to four
-decimal places.</em></li>
-</ol>
-<p>In the outcome that each tree type is next to each other, we have the
-first 5 places filled by one tree type (say sycamore for this example).
-Since we are using replacement here, the denominator of our
-probabilities changes for each place/ The first place doesn’t affect the
-probability, as it could be either a sycamore tree or a cypress tree,
-but needs to be followed by 4 trees of the same type</p>
+<div id="probability-exercise-7.1.3" class="section level2">
+<h2>Probability Exercise 7.1.3</h2>
+<p><strong>Question:</strong> Let <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span> be independent random variables with
+common distribution</p>
 <span class="math display">\[\begin{aligned}
-  P =  \frac{4}{9} \cdot \frac{3}{8} \cdot \frac{2}{7} \cdot \frac{1}{6}
-= 0.0080
+  p_X = \begin{pmatrix}
+          0 &amp; 1 &amp; 2 \\
+          \frac{1}{8} &amp; \frac{3}{8} &amp; \frac{1}{2}
+        \end{pmatrix}
 \end{aligned}\]</span>
-<p>Let’s check our calculation with R:</p>
-<pre class="r"><code>trees &lt;- (5/10) * (4/9) * (3/8) * (2/7) * (1/6)
-round(trees, 4)</code></pre>
-<pre><code>## [1] 0.004</code></pre>
-<ol start="9" style="list-style-type: decimal">
-<li><em>If you draw a queen or lower from a standard deck of cards, I
-will pay you $4. If not, you pay me $16. (Aces are considered the
-highest card in the deck.)</em></li>
-</ol>
-<ol style="list-style-type: lower-alpha">
-<li><em>Find the expected value of the proposition. Round your answer to
-two decimal places. Losses must be expressed as negative values.</em>
-There are 2 outcomes: <code>success</code> (king or ace drawn), or
-<code>failure</code> (queen or lower). We can calculate the expected
-value as the probability of success multiplied by the success payout
-($4) plus the probability of failure multiplied by the failure “payout”
-(-$16 or a $16 loss)</li>
-</ol>
-<pre class="r"><code>prob_failure &lt;- 8 / 52
-prob_success &lt;- 44 / 52
-p &lt;- (4 * prob_success) - (16 * prob_failure)
+<p>Find the distribution of the sum <span class="math inline">\(Z = X_1
++ X_2\)</span></p>
+</div>
+<div id="solution" class="section level2">
+<h2>Solution</h2>
+<p>We can build off the method used in example 7.1 here. We can use the
+convolution of the above distribution to find the probability
+distribution for each sum value that Z can take: <span class="math inline">\(z \in \{0, 1, 2, 3, 4\}\)</span>. We’ll follow the
+book’s notation and let <span class="math inline">\(m(x) = p_X \forall x
+\in \{0,1,2\}\)</span></p>
+<div id="z-0" class="section level4">
+<h4>Z = 0</h4>
+<p>In the case that <span class="math inline">\(Z = 0\)</span> both
+<span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span> are 0. We can take the below
+convolution:</p>
+<span class="math display">\[\begin{aligned}
+  P(Z = 0) = p_X(0) \cdot p_X(0) = \frac{1}{8} \cdot \frac{1}{8} =
+\frac{1}{64}
+\end{aligned}\]</span>
+<pre class="r"><code>p0 &lt;- 1/8 * 1/8
 
-# Calculate expected value
-expected_value &lt;- round(p, 2)
-print(expected_value)</code></pre>
-<pre><code>## [1] 0.92</code></pre>
-<ol start="2" style="list-style-type: lower-alpha">
-<li><em>If you played this game 833 times how much would you expect to
-win or lose? Round your answer to two decimal places. Losses must be
-expressed as negative values.</em></li>
-</ol>
-<p>We can multiply our expected value by the number of trials (<span class="math inline">\(833\)</span>)</p>
-<pre class="r"><code>expected_value * 833</code></pre>
-<pre><code>## [1] 766.36</code></pre>
+1/64 == p0</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="z-1" class="section level4">
+<h4>Z = 1</h4>
+<p>This outcome could occur when either <span class="math inline">\(X_1
+= 0\)</span>, and <span class="math inline">\(X_2 = 1\)</span>, or vice
+versa. We can take the convolution below to get the probability of the
+outcome <span class="math inline">\(Z=1\)</span></p>
+<span class="math display">\[\begin{aligned}
+  P(Z = 1) = m(0)m(1) + m(1)m(0)
+           = \frac{1}{8}\frac{3}{8} + \frac{3}{8}\frac{1}{8}
+           = \frac{6}{64}
+\end{aligned}\]</span>
+<pre class="r"><code>p1 &lt;- (1/8 * 3/8) + (3/8 * 1/8)
+
+6/64 == p1</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="z-2" class="section level4">
+<h4>Z = 2</h4>
+<p>This outcome could occur when either both <span class="math inline">\(X_1, X_2 = 1\)</span>, <span class="math inline">\(X_1 = 0\)</span>, and <span class="math inline">\(X_2 = 2\)</span>, or vice versa. We can take the
+convolution below to get the probability of the outcome <span class="math inline">\(Z=2\)</span></p>
+<span class="math display">\[\begin{aligned}
+  P(Z = 2) = m(0)m(2) + m(1)m(1) + m(2)m(0)
+           = \frac{1}{8}\frac{1}{2} + \frac{3}{8}\frac{3}{8}  +
+\frac{1}{2}\frac{1}{8}
+           = \frac{17}{64}
+\end{aligned}\]</span>
+<p>Checking our math with the R code below</p>
+<pre class="r"><code>p2 &lt;- (1/8 * 1/2) + (3/8 * 3/8) + (1/2 * 1/8)
+
+17/64 == p2</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="z-3" class="section level4">
+<h4>Z = 3</h4>
+<p>This outcome can only occur when <span class="math inline">\(X_1 =
+1\)</span> and <span class="math inline">\(X_2 = 2\)</span>, or vice
+versa. Neither “input” random variable can take the value 0 and have
+<span class="math inline">\(Z=3\)</span>, as it’s their sum. We can take
+the convolution to ge <span class="math inline">\(Z\)</span>’s
+distribtuion function’s value for <span class="math inline">\(Z=3\)</span></p>
+<span class="math display">\[\begin{aligned}
+  P(Z = 3) = m(1)m(2) + m(2)m(1)
+           = \frac{3}{8}\frac{1}{2} + \frac{1}{2}\frac{3}{8}
+           = \frac{24}{64}
+\end{aligned}\]</span>
+<p>Check our math for the <span class="math inline">\(Z=3\)</span>
+case:</p>
+<pre class="r"><code>p3 &lt;- (3/8 * 1/2) + (1/2 * 3/8)
+
+24/64 == p3</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="z-4" class="section level4">
+<h4>Z = 4</h4>
+<p>Finally, this outcome only occurs when both <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span> both are equal to 2. We can get the
+convolution from the probability distributions for each random variable
+being equal to 2 multiplied together (because <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span> are independent):</p>
+<span class="math display">\[\begin{aligned}
+  P(Z = 4) = \frac{1}{2} \cdot \frac{1}{2} = \frac{1}{4} = \frac{16}{64}
+\end{aligned}\]</span>
+<pre class="r"><code>p4 &lt;- (1/2 * 1/2)
+
+16/64 == p4</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="check" class="section level3">
+<h3>Check</h3>
+<p>Finally, we can check our work that our probability distribution (sum
+of each discrete distribution value above) sums to 1:</p>
+<pre class="r"><code>probability_sum &lt;- p0 + p1 + p2 + p3 + p4
+
+1.0 == probability_sum</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
+</div>
 
 
 

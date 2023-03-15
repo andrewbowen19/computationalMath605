@@ -73,7 +73,7 @@ Updating this to use the complement calculation. In essence, what are the chance
 5. *Lorenzo is picking out some movies to rent, and he is primarily interested in documentaries and mysteries. He has narrowed down his selections to 17 documentaries and 14 mysteries.*
 
   a. *How many different combinations of 5 movies can he rent?*
-There are 31 total movies so we can use the `choose` functiont o calculate this number of outcomes
+There are 31 total movies so we can use the `choose` function to calculate this number of outcomes
 ```{r movies}
 n_movies <- 31
 n_movie_slots <- 5
@@ -85,7 +85,7 @@ choose(n_movies, n_movie_slots)
   
 We can treat the first movie "place" as any of the 14 mysteries. Then we can treat it as a selection problem with replacement
 ```{r}
-14* partial_factorial(30, 27)
+14 * partial_factorial(30, 27)
 ```
 
 6. *In choosing what music to play at a charity fund raising event, Cory needs to have an equal number of symphonies from Brahms, Haydn, and Mendelssohn. If he is setting up a schedule of the 9 symphonies to be played, and he has 4 Brahms, 104 Haydn, and 17 Mendelssohn symphonies from which to choose, how many different schedules are possible? Express your answer in scientific notation rounding to the hundredths place.*
