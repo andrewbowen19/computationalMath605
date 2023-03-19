@@ -1,0 +1,163 @@
+---
+title: "DATA605 Problem Set 8"
+author: "Andrew Bowen"
+date: "2023-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 7.2.11 (p. 303)
+
+From exercise 10, we are given that the density for a random variable $M$ which is the minimum of a set of random variables $X_1, X_2, \dots, X_n$ following an exponential distribution is $\mu/n$, $\mu$ is the mean of the random $X_j$
+
+In the case of our company, we can take 1000 hours to be the mean value for the exponential lifetime density function. Plugging into our formula, we get:
+
+
+\begin{aligned}
+  E(M) = \frac{\mu}{n} = 1000 / 100 = 10
+\end{aligned}
+
+Where $M$ in this case is the lifetime of the shortest-burning bulb, or the *minimum* value of the random variable corresponding to the lifetime of each bulb. In this case, the company can expect the first bulb to burn out in 10 hours
+
+
+## Exercise 7.2.14 (p. 303)
+We know based on the definition of a random variable $X$ having an [exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution) that the density function looks like:
+
+\begin{aligned}
+  f_X(x) = \begin{cases}
+    \lambda e^{-\lambda x} & \text{if } x \ge 0\\
+    0  &otherwise
+  \end{cases}
+\end{aligned}
+
+Combining these two, we can take their convolution to get the following:
+
+\begin{aligned}
+f_{x_1, x_2}(x_1, x_2) = \lambda^{2} e^{-\lambda x_1} e^{-\lambda x_2}
+\end{aligned}
+
+Assuming both $x_1, x_2$ share the same rate parameter $\lambda$.
+
+where we can take $x_1, x_2$ to be the values taken by random variables $X_1, X_2$. We can do some manipulation within our probability distribution, where $z$ is the value taken by $Z$. We can find our cumulative distribution function, $F_Z(z)$. then differentiate to get the probability distribution for $Z$
+
+\begin{aligned}
+  F_Z(z) = P(Z \le z) \newline
+         = P(X_1 - X_2 \le z) \newline
+         = P(X_2 \ge X_1 - z) \newline
+\end{aligned}
+
+We'll need to split this problem over our domain of $-\infty \le z \le \infty$. Let's take the case where $z \le 0$ first:
+
+\begin{aligned}
+  F_Z(z) = \int_{0}^{\infty} \int_{x_1 - z}^{\infty} \lambda^2 e^{-\lambda x_1} e^{-\lambda x_2} \,dx_2\,dx_1 \newline
+         = -\lambda \int_{0}^{\infty} e^{\lambda z - 2 x_1 \lambda} \,dx1 \newline
+         = \frac{1}{2}e^{\lambda z}
+\end{aligned}
+The integral bounds we're using here reflect the fact that we care about the case where $x_2 > x_1$, since we bounded $z \le 0$, that means $0 \le x_1 \le \infty$
+
+Now we can look at our case when $z > 0$:
+
+\begin{aligned}
+  F_Z(z) = 1 - P(Z \le z) \newline
+         = 1 - P(X_1 - X_2 \le z) \newline
+         = 1 - P(X_2 \ge X_1 - z) \newline
+         = 1 - \int_{z}^{\infty} \int_{0}^{x_1 - z} \lambda^2 e^{-\lambda x_1} e^{-\lambda x_2} \,dx_2\,dx_1 \newline
+         = 1 + \lambda \int_{z}^{\infty} e^{-\lambda (2x_1 - z)} \,dx1 \newline
+         = \frac{1}{2}e^{\lambda z}
+         
+\end{aligned}
+
+We can then differentiate our $F_Z(z)$ with respect to $z$ to find our density $f_Z(z)$
+
+\begin{equation}
+f_Z(z)=
+    \begin{cases}
+        \frac{\lambda}{2}e^{-\lambda z} & \text{if } z > 0\\
+        \frac{\lambda}{2}e^{\lambda z} & \text{if } z \le 0
+    \end{cases}
+\end{equation}
+
+In this case, the sign of $z$ matters in terms of where we are in our domain $[-\infty, \infty]$. In both of the cases above, the exponential argument evaluates to a value less than or equal to 0, keeping the probability density function bounded. When $z \ne 0$, the above cases evaluate to the same value. Because of this, we can simpliify our density function to:
+
+\begin{aligned}
+  f_Z(z)= \frac{\lambda}{2}e^{-\lambda |z|}
+\end{aligned}
+
+## Exercise 8.2.1 (p. 320)
+
+[Chebyshev's inequality](https://en.wikipedia.org/wiki/Chebyshev%27s_inequality) tells us that for a continuous random variable with density $f(x)$, with finite expected value and variance, for any positive number $\epsilon > 0$ we have:
+
+\begin{aligned}
+  P(|X - \mu| \ge \epsilon) \le \frac{\sigma^2}{\epsilon^2}
+\end{aligned}
+
+We can define an R function to take $\epsilon$ as our input to help us calculate these upper bounds numerically:
+
+```{r chebyshev}
+chebyshev_upper <- function(sigma, epsilon){
+  # Calculates upper bound for Chebyshev's inequality based on random var variance sigma and a positive number epsilon
+  ((sigma ** 2) / (epsilon ** 2))
+  
+}
+
+# test call of our function
+4 == chebyshev_upper(10, 5)
+```
+
+In our case, we can plug in our mean value $\mu = 10$ and variance $\sigma^2 = 100 / 3$ to find our upper bound
+
+a.
+\begin{aligned}
+  P(|X - 10| \ge 2) \le \frac{(100 / 3)^2}{2^2} = \frac{111.\overline{11}}{4} = 277.\overline{777}
+\end{aligned}
+
+Let's test with our R function
+```{r a}
+problem_sigma = 100 / 3 
+chebyshev_upper(problem_sigma, 2)
+```
+
+b.
+\begin{aligned}
+  P(|X - 10| \ge 5) \le \frac{(100 / 3)^2}{5^2} = \frac{1111.111}{25} = 44.\overline{444}
+\end{aligned}
+We can check our calculation using our function
+```{r b}
+chebyshev_upper(problem_sigma, 5)
+```
+
+c.
+\begin{aligned}
+  P(|X - 10| \ge 9) \le \frac{(100 / 3)^2}{9^2} = \frac{1111.111}{81} = 13.717
+\end{aligned}
+
+```{r c}
+chebyshev_upper(problem_sigma, 9)
+```
+
+
+d.
+\begin{aligned}
+  P(|X - 10| \ge 20) \le \frac{(100 / 3)^2}{20^2} = \frac{1111.111}{400} = 2.\overline{777}
+\end{aligned}
+checking our last upper bound programmatically:
+```{r d}
+chebyshev_upper(problem_sigma, 20)
+```
+
+In fact, we could complete these problems in a for loop, iterating over each value of epsilon
+```{r}
+library(glue)
+epsilons <- c(2, 5, 9, 20)
+
+for (e in epsilons){
+  upper_bound <- chebyshev_upper(problem_sigma, e)
+  print(glue("Epsilon: {e}, upper bound: {upper_bound}"))
+}
+```
+
+
+
