@@ -1,0 +1,223 @@
+---
+title: "DATA605 Week 9 Discussion Post"
+author: "Andrew Bowen"
+date: "2023-03-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(glue)
+library(ggplot2)
+```
+
+## Exercise 9.3.9
+
+**How large must n be before $S_n = X_1 +X_2 + \dots + X_n$ is approximately normal? This number is often surprisingly small. Let us explore this question with a computer simulation. Choose n numbers from $[0, 1]$ with probability density $f(x)$, where $n = 3, 6, 12, 20$, and $f(x)$ is each of the densities in Exercise 7. Compute their sum Sn, repeat this experiment 1000 times, and make up a bar graph of 20 bars of the results. How large must n be before you get a good fit?**
+
+
+We can perform this operation computationally
+
+```{r}
+set.seed(1234)
+sample_sizes <- c(3, 6, 12, 20)
+n_trials <- 1000
+```
+
+a. $f(x) = 1$
+This corresponds to a uniform distribution, so we can use the built-in `runif` function from R
+```{r}
+df <- data.frame(S_3=c(1:1000), 
+                 S_6=c(1:1000),
+                 S_12=c(1:1000),
+                 S_20=c(1:1000))
+for (n in sample_sizes){
+  trial_sums <- c()
+  for (i in seq(1, 1000)){
+    t <- sum(runif(n))
+    trial_sums <- append(trial_sums, t)
+  }
+  df[glue('S_{n}')] <- trial_sums
+}
+
+
+ggplot(df, aes(x=S_3)) + geom_histogram(bins=20)
+
+# Sample size of 6
+ggplot(df, aes(x=S_6)) + geom_histogram(bins=20)
+
+# Sample size of 12
+ggplot(df, aes(x=S_12)) + geom_histogram(bins=20)
+
+# Sample size of 20
+ggplot(df, aes(x=S_20)) + geom_histogram(bins=20)
+```
+
+
+b. $f(x) = 2x$
+Here we'll need to define a custom PDF from which we can sample from. We can do this by definition our probability density function `f` as an R function, then feed that function a vector sampled from a uniform distribution between $[0,1]$. For further reference check [this RPubs](https://rpubs.com/a_pear_9/weird_distributions)
+```{r}
+df <- data.frame(S_3=c(1:1000), 
+                 S_6=c(1:1000),
+                 S_12=c(1:1000),
+                 S_20=c(1:1000))
+
+f <- function(x){2 *x} # custom PDF
+for (n in sample_sizes){
+  trial_sums <- c()
+  for (i in seq(1, n_trials)){
+    u <- runif(n_trials)
+    r <- f(u)
+    t <- sum(r)
+    trial_sums <- append(trial_sums, t)
+  }
+  df[glue('S_{n}')] <- trial_sums
+}
+
+
+ggplot(df, aes(x=S_3)) + geom_histogram(bins=20)
+
+# Sample size of 6
+ggplot(df, aes(x=S_6)) + geom_histogram(bins=20)
+
+# Sample size of 12
+ggplot(df, aes(x=S_12)) + geom_histogram(bins=20)
+
+# Sample size of 20
+ggplot(df, aes(x=S_20)) + geom_histogram(bins=20)
+```
+
+c. $f(x) = 3x^2$
+Again, we'll define a custom pdf here: `f`, and feed it random values sampled from the uniform distribution
+```{r}
+df <- data.frame(S_3=c(1:1000), 
+                 S_6=c(1:1000),
+                 S_12=c(1:1000),
+                 S_20=c(1:1000))
+
+f <- function(x){3 * (x**2)} # custom PDF
+for (n in sample_sizes){
+  trial_sums <- c()
+  for (i in seq(1, n_trials)){
+    u <- runif(n_trials)
+    r <- f(u)
+    t <- sum(r)
+    trial_sums <- append(trial_sums, t)
+  }
+  df[glue('S_{n}')] <- trial_sums
+}
+
+
+ggplot(df, aes(x=S_3)) + geom_histogram(bins=20)
+
+# Sample size of 6
+ggplot(df, aes(x=S_6)) + geom_histogram(bins=20)
+
+# Sample size of 12
+ggplot(df, aes(x=S_12)) + geom_histogram(bins=20)
+
+# Sample size of 20
+ggplot(df, aes(x=S_20)) + geom_histogram(bins=20)
+```
+
+d. $f(x)=4|x−1/2|$
+```{r}
+df <- data.frame(S_3=c(1:1000), 
+                 S_6=c(1:1000),
+                 S_12=c(1:1000),
+                 S_20=c(1:1000))
+
+f <- function(x){4 * abs(x - (1/2))} # custom PDF
+for (n in sample_sizes){
+  trial_sums <- c()
+  for (i in seq(1, n_trials)){
+    u <- runif(n_trials)
+    r <- f(u)
+    t <- sum(r)
+    trial_sums <- append(trial_sums, t)
+  }
+  df[glue('S_{n}')] <- trial_sums
+}
+
+
+ggplot(df, aes(x=S_3)) + geom_histogram(bins=20)
+
+# Sample size of 6
+ggplot(df, aes(x=S_6)) + geom_histogram(bins=20)
+
+# Sample size of 12
+ggplot(df, aes(x=S_12)) + geom_histogram(bins=20)
+
+# Sample size of 20
+ggplot(df, aes(x=S_20)) + geom_histogram(bins=20)
+```
+e. $f(x)=2−4|x−1/2|$
+```{r}
+df <- data.frame(S_3=c(1:1000), 
+                 S_6=c(1:1000),
+                 S_12=c(1:1000),
+                 S_20=c(1:1000))
+
+f <- function(x){2 - (4 * abs(x - (1/2)))} # custom PDF
+for (n in sample_sizes){
+  trial_sums <- c()
+  for (i in seq(1, n_trials)){
+    u <- runif(n_trials)
+    r <- f(u)
+    t <- sum(r)
+    trial_sums <- append(trial_sums, t)
+  }
+  df[glue('S_{n}')] <- trial_sums
+}
+
+
+ggplot(df, aes(x=S_3)) + geom_histogram(bins=20)
+
+# Sample size of 6
+ggplot(df, aes(x=S_6)) + geom_histogram(bins=20)
+
+# Sample size of 12
+ggplot(df, aes(x=S_12)) + geom_histogram(bins=20)
+
+# Sample size of 20
+ggplot(df, aes(x=S_20)) + geom_histogram(bins=20)
+```
+
+
+We can see that a larger sample size $n$ makes the sampling distribtion of the sum of our trials more nearly be modeled by a normal distribution. In general, the [CLT is best applied for sample sizes greater than 30](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5370305/). In our experiments, a sample size of 20 was generally 
+
+
+We can demonstrate this by having larger sample size ($50, 500, 5000$) and a much larger trial number (10,000 instead of 1000). As we have larger sample sizes and a larger number of trials, we should see the resulting distribution of sums be even more "normally-shaped"
+```{r}
+n_trials <- 10000 # larger number of trials
+df <- data.frame(S_50=c(1:n_trials), 
+                 S_500=c(1:n_trials),
+                 S_5000=c(1:n_trials)
+                 )
+sample_sizes <- c(50, 500, 5000)
+
+f <- function(x){2 - (4 * abs(x - (1/2)))} # custom PDF
+for (n in sample_sizes){
+  trial_sums <- c()
+  for (i in seq(1, n_trials)){
+    u <- runif(n_trials)
+    r <- f(u)
+    t <- sum(r)
+    trial_sums <- append(trial_sums, t)
+  }
+  df[glue('S_{n}')] <- trial_sums
+}
+
+# Sample size of 50
+ggplot(df, aes(x=S_50)) + geom_histogram(bins=20)
+
+# Sample size of 500
+ggplot(df, aes(x=S_500)) + geom_histogram(bins=20)
+
+# Sample size of 5000
+ggplot(df, aes(x=S_5000)) + geom_histogram(bins=20)
+```
+

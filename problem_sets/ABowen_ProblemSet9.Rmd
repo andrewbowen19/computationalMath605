@@ -1,0 +1,171 @@
+---
+title: "DATA605 Problem Set 9"
+author: "Andrew Bowen"
+date: "2023-03-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 
+
+First, let's define our distribution parameters for $X_n = Y_{n + 1} - Y_{n}$. We can do some manipulation and substitution to get to a random variable definition we can use:
+
+\begin{aligned}
+  X_n = Y_{n + 1} - Y_{n}
+  Y_{n+1} = X_n + Y_n
+\end{aligned}
+
+```{r}
+mu <- 0
+sigma = sqrt(1 / 4)
+sn <- sqrt(365)
+```
+
+a. $Y_{365} \ge 100$ 
+```{r}
+(pnorm(q = (100 - 100)/sn, mean = mu, sd = sigma, lower.tail = TRUE))
+```
+
+
+b. $Y_{365} \ge 110$ 
+```{r}
+(pnorm(q = (100 - 110)/sn, mean = mu, sd = sigma, lower.tail = TRUE))
+```
+
+
+c. $Y_{365} \ge 120$ 
+```{r}
+(pnorm(q = (100 - 120)/sn, mean = mu, sd = sigma, lower.tail = TRUE))
+```
+
+## Expected Value and Variance of Binomial Distribution
+We start with a [binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution) for$k$ successes in $n$ trials with probability of success $p$
+
+\begin{aligned}
+  P(k: n, p) = {n \choose k}p^kq^{n-k}
+\end{aligned}
+
+where $q = 1 - p$. Since these trials are discrete, we can use the moment-generating function for discrete probability distributions:
+
+\begin{aligned}
+  M_x(t) = \sum_{x}e^{tx}P(x)
+\end{aligned}
+
+Plugging in our binomial probability distribution, we get:
+
+\begin{aligned}
+  M_k(t) = \sum_{k}e^{tk}{n \choose k}p^kq^{n-k} \newline
+         = \sum_{k}{n \choose k}(pe^t)^kq^{n-k}
+\end{aligned}
+
+Here we make use of the [binomial theorem](https://en.wikipedia.org/wiki/Binomial_theorem#Statement), which states:
+
+\begin{aligned}
+  (x + y)^n = \sum_{k=0}^{n}{n \choose k}x^ky^{n-k}
+\end{aligned}
+
+Inserting this into our formula, we get:
+
+\begin{aligned}
+  M_k(t) = \sum_{k}{n \choose k}(pe^t)^kq^{n-k} \newline
+  M_k(t) = (pe^t + q)^n
+\end{aligned}
+
+Now that we have our moment generator function $M_k(t)$, we can differentiate to get our expected value and variance of our binomial distribution:
+
+\begin{aligned}
+  E(X) = \mu_1 = M_k'(0) = n(pe^t + q)^{n-1}pe^t \rvert_{t=0} \newline
+       = n(pe^0 + 1 - p)^{n-1}pe^0 \newline
+       = np
+\end{aligned}
+
+This result aligns with what we know about the [properties of the binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution#Properties). Now to find the variance, we'll need to differentiate again. We also need to remember the definition of our vairance based off moments:
+
+\begin{aligned}
+  \sigma^2 = E(X^2) - E(X)^2 = \mu_2 - \mu_{1}^{2}
+\end{aligned}
+
+For the second moment, we calculate:
+
+\begin{aligned}
+  Var(X) = \mu_2 = M_k''(0) = \frac{d}{\,dt}(n(pe^t + q)^{n-1}pe^t) \rvert_{t=0}
+\end{aligned}
+
+We can use the product rule to find the second derivative:
+
+\begin{aligned}
+   M_k''(0) = n(n-1)(pe^t + q)^{n - 2}p^2e^2t + n(pe^t + q)^{n-1}pe^t \rvert_{t=0} \newline
+            = n(n-1)(pe^0 + q)^{n - 2}p^2e^0 + n(pe^t + q)^{n-1}pe^0 \newline
+            = n(n-1)p + np \newline
+            = n^2p^2 - np^2 + np
+\end{aligned}
+
+Now, we can plug the above values into our variance formula $Var(x) = \sigma^2 = \mu_2 - \mu_1^2$
+
+\begin{aligned}
+  \sigma^2 = n^2p^2 - np^2 + np - n^2p^2 \newline
+           = np - np^2 = np(1 - p)
+  
+\end{aligned}
+
+Which again aligns with the [properties we know of the binomial distribution](https://en.wikipedia.org/wiki/Binomial_theorem#Statement)
+
+## Expected Value and Variance of Exponential Distribution
+We know based on the definition of a random variable $X$ having an [exponential distribution](https://en.wikipedia.org/wiki/Exponential_distribution) that the density function looks like:
+
+\begin{aligned}
+  f_X(x) = \begin{cases}
+    \lambda e^{-\lambda x} & \text{if } x \ge 0\\
+    0  &otherwise
+  \end{cases}
+\end{aligned}
+
+We first calculate the moment generating function:
+
+\begin{aligned}
+  M_x(t) = \int_{0}^{\infty}e^{tx}f(x)\,dx \newline
+         = \int_{0}^{\infty}e^{tx} \lambda e^{-\lambda x}\,dx \newline
+         = \lambda \int_{0}^{\infty}e^{tx} e^{-\lambda x}\,dx \newline
+         =  \lambda \int_{0}^{\infty} e^{x(t -\lambda )}\,dx
+\end{aligned}
+
+Integrating with respect to $x$, we get
+
+\begin{aligned}
+  M_x(t) = \frac{-\lambda}{t - \lambda} e^{x(t - \lambda)} \rvert_{0}^{\infty} \newline
+         = \frac{-\lambda}{t - \lambda}\left ( e^{\infty(t - \lambda)} - e^0\right)
+\end{aligned}
+
+The above expression converges only in the case where $t < \lambda$, because then the exponential argument in the first term does not diverge. Taking this constraint into account, we can simplify to get:
+
+\begin{aligned}
+  M_x(t) = frac{-\lambda}{t - \lambda}, t < \lambda
+\end{aligned}
+
+We can differentiate to find the first moment (and consequently the expected value of our exponential distribution):
+
+\begin{aligned}
+  E(X) = \mu_1 = M_x'(0) = -\lambda \frac{d}{\,dt}((t - \lambda)^-1) \rvert_{t = 0} \newline
+       = \frac{\lambda}{(t - \lambda)^2} \rvert_{t = 0}
+       = \frac{\lambda}{\lambda^2} = \frac{1}{\lambda}
+\end{aligned}
+
+Which aligned with what [we know about exponential distributions](https://en.wikipedia.org/wiki/Exponential_distribution#Mean,_variance,_moments,_and_median)
+
+We now can find the variance by finding $\mu_2$, then plugging into our variance formula: $\sigma^2 = \mu_2 - \mu_1^2$
+
+\begin{aligned}
+  \mu_2 = M_x''(0) = \frac{d}{\,dt}\left[ \frac{\lambda}{(t - \lambda)^2}\right] \rvert_{t=0} \newline
+        = \frac{-2\lambda}{(t - \lambda)^3} \rvert_{t=0} \newline
+        = \frac{-2\lambda}{\lambda^3} \newline
+        = \frac{2}{\lambda^2}
+\end{aligned}
+
+Now we can get our variance value
+
+\begin{aligned}
+  Var(x) = \sigma^2 = \mu_2 - \mu_1^2 = \frac{2}{\lambda^2} - (\frac{1}{\lambda})^2 = \frac{1}{\lambda^2}
+\end{aligned}
