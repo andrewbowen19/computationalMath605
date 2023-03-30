@@ -11,9 +11,9 @@
 
 <meta name="author" content="Andrew Bowen" />
 
-<meta name="date" content="2023-03-21" />
+<meta name="date" content="2023-03-27" />
 
-<title>DATA605 Problem Set 9</title>
+<title>DATA605 Problem Set 10</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -356,165 +356,97 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">DATA605 Problem Set 9</h1>
+<h1 class="title toc-ignore">DATA605 Problem Set 10</h1>
 <h4 class="author">Andrew Bowen</h4>
-<h4 class="date">2023-03-21</h4>
+<h4 class="date">2023-03-27</h4>
 
 </div>
 
 
-<div id="exercise" class="section level2">
-<h2>Exercise</h2>
-<p>First, let’s define our distribution parameters for <span class="math inline">\(X_n = Y_{n + 1} - Y_{n}\)</span>. We can do some
-manipulation and substitution to get to a random variable definition we
-can use:</p>
+<div id="problem" class="section level2">
+<h2>Problem</h2>
+<p>Smith is in jail and has 1 dollar; he can get out on bail if he has 8
+dollars. A guard agrees to make a series of bets with him. If Smith bets
+<span class="math inline">\(A\)</span> dollars, he wins A dollars with
+probability <span class="math inline">\(0.4\)</span> and loses <span class="math inline">\(A\)</span> dollars with probability <span class="math inline">\(0.6\)</span>. Find the probability that he wins 8
+dollars before losing all of his money if: a. He bets 1 dollar each time
+(<em>timid strategy</em>). b. He bets, each time, as much as possible
+but not more than necessary to bring his fortune up to 8 dollars
+(<em>bold strategy</em>). c. Which strategy gives Smith the better
+chance of getting out of jail?</p>
+<div id="timid-strategy" class="section level3">
+<h3>Timid Strategy</h3>
+We can use the probability of reaching our “winning sum” (<span class="math inline">\(M\)</span>) of $8 from the gambler’s ruin section
+of <a href="https://math.dartmouth.edu/~prob/prob/prob.pdf">our
+textbook</a> (Chapter 12.2):
 <span class="math display">\[\begin{aligned}
-  X_n = Y_{n + 1} - Y_{n}
-  Y_{n+1} = X_n + Y_n
+  P = \frac{(\frac{q}{p})^s - 1}{(\frac{q}{p})^M - 1}
 \end{aligned}\]</span>
-<pre class="r"><code>mu &lt;- 0
-sigma = sqrt(1 / 4)
-sn &lt;- sqrt(365)</code></pre>
-<ol style="list-style-type: lower-alpha">
-<li><span class="math inline">\(Y_{365} \ge 100\)</span></li>
-</ol>
-<pre class="r"><code>(pnorm(q = (100 - 100)/sn, mean = mu, sd = sigma, lower.tail = TRUE))</code></pre>
-<pre><code>## [1] 0.5</code></pre>
-<ol start="2" style="list-style-type: lower-alpha">
-<li><span class="math inline">\(Y_{365} \ge 110\)</span></li>
-</ol>
-<pre class="r"><code>(pnorm(q = (100 - 110)/sn, mean = mu, sd = sigma, lower.tail = TRUE))</code></pre>
-<pre><code>## [1] 0.1475849</code></pre>
-<ol start="3" style="list-style-type: lower-alpha">
-<li><span class="math inline">\(Y_{365} \ge 120\)</span></li>
-</ol>
-<pre class="r"><code>(pnorm(q = (100 - 120)/sn, mean = mu, sd = sigma, lower.tail = TRUE))</code></pre>
-<pre><code>## [1] 0.01814355</code></pre>
+<p>where <span class="math inline">\(s\)</span> is Smith’s starting
+stake, <span class="math inline">\(q\)</span> is the probability of
+failure in a given turn, and <span class="math inline">\(p\)</span> is
+the probability of success in a given turn. We can plug into our formula
+with the following R code:</p>
+<pre class="r"><code>p &lt;- 0.4
+q &lt;- 0.6
+M &lt;- 8
+s &lt;- 1
+
+# Calculate probability of reaching $8 with timid strategy
+(p_timid &lt;- ((q / p)**s - 1) / ((q / p)**M - 1))</code></pre>
+<pre><code>## [1] 0.02030135</code></pre>
+<pre class="r"><code>library(markovchain)</code></pre>
+<pre><code>## Package:  markovchain
+## Version:  0.9.1
+## Date:     2023-01-20
+## BugReport: https://github.com/spedygiorgio/markovchain/issues</code></pre>
 </div>
-<div id="expected-value-and-variance-of-binomial-distribution" class="section level2">
-<h2>Expected Value and Variance of Binomial Distribution</h2>
-<p>We start with a <a href="https://en.wikipedia.org/wiki/Binomial_distribution">binomial
-distribution</a> for <span class="math inline">\(k\)</span> successes in
-<span class="math inline">\(n\)</span> trials with probability of
-success <span class="math inline">\(p\)</span></p>
-<span class="math display">\[\begin{aligned}
-  P(k: n, p) = {n \choose k}p^kq^{n-k}
-\end{aligned}\]</span>
-<p>where <span class="math inline">\(q = 1 - p\)</span>. Since these
-trials are discrete, we can use the moment-generating function for
-discrete probability distributions:</p>
-<span class="math display">\[\begin{aligned}
-  M_x(t) = \sum_{x}e^{tx}P(x)
-\end{aligned}\]</span>
-<p>Plugging in our binomial probability distribution, we get:</p>
-<span class="math display">\[\begin{aligned}
-  M_k(t) = \sum_{k}e^{tk}{n \choose k}p^kq^{n-k} \newline
-         = \sum_{k}{n \choose k}(pe^t)^kq^{n-k}
-\end{aligned}\]</span>
-<p>Here we make use of the <a href="https://en.wikipedia.org/wiki/Binomial_theorem#Statement">binomial
-theorem</a>, which states:</p>
-<span class="math display">\[\begin{aligned}
-  (x + y)^n = \sum_{k=0}^{n}{n \choose k}x^ky^{n-k}
-\end{aligned}\]</span>
-<p>Inserting this into our formula, we get:</p>
-<span class="math display">\[\begin{aligned}
-  M_k(t) = \sum_{k}{n \choose k}(pe^t)^kq^{n-k} \newline
-  M_k(t) = (pe^t + q)^n
-\end{aligned}\]</span>
-<p>Now that we have our moment generator function <span class="math inline">\(M_k(t)\)</span>, we can differentiate to get our
-expected value and variance of our binomial distribution:</p>
-<span class="math display">\[\begin{aligned}
-  E(X) = \mu_1 = M_k&#39;(0) = n(pe^t + q)^{n-1}pe^t \rvert_{t=0}
-\newline
-       = n(pe^0 + 1 - p)^{n-1}pe^0 \newline
-       = np
-\end{aligned}\]</span>
-<p>This result aligns with what we know about the <a href="https://en.wikipedia.org/wiki/Binomial_distribution#Properties">properties
-of the binomial distribution</a>. Now to find the variance, we’ll need
-to differentiate again. We also need to remember the definition of our
-variance based off moments:</p>
-<span class="math display">\[\begin{aligned}
-  \sigma^2 = E(X^2) - E(X)^2 = \mu_2 - \mu_{1}^{2}
-\end{aligned}\]</span>
-<p>For the second moment, we calculate:</p>
-<span class="math display">\[\begin{aligned}
-  Var(X) = \mu_2 = M_k&#39;&#39;(0) = \frac{d}{\,dt}(n(pe^t +
-q)^{n-1}pe^t) \rvert_{t=0}
-\end{aligned}\]</span>
-<p>We can use the product rule to find the second derivative:</p>
-<span class="math display">\[\begin{aligned}
-   M_k&#39;&#39;(0) = n(n-1)(pe^t + q)^{n - 2}p^2e^2t + n(pe^t +
-q)^{n-1}pe^t \rvert_{t=0} \newline
-            = n(n-1)(pe^0 + q)^{n - 2}p^2e^0 + n(pe^t + q)^{n-1}pe^0
-\newline
-            = n(n-1)p + np \newline
-            = n^2p^2 - np^2 + np
-\end{aligned}\]</span>
-<p>Now, we can plug the above values into our variance formula <span class="math inline">\(Var(x) = \sigma^2 = \mu_2 - \mu_1^2\)</span></p>
-<span class="math display">\[\begin{aligned}
-  \sigma^2 = n^2p^2 - np^2 + np - n^2p^2 \newline
-           = np - np^2 = np(1 - p)
-  
-\end{aligned}\]</span>
-<p>Which again aligns with the <a href="https://en.wikipedia.org/wiki/Binomial_theorem#Statement">properties
-we know of the binomial distribution</a></p>
+<div id="bold-strategy" class="section level3">
+<h3>Bold Strategy</h3>
+<p>In this case, the amount gambled depends on the amount of money Smith
+has in his possession (his winnings up until that point). Let’s start
+with the case that he starts with <span class="math inline">\(s =
+\$1\)</span>. Assuming whole dollar bets, he will gamble $1 in the first
+turn (<span class="math inline">\(k=1\)</span>). If he wins, he will
+have $2, which he will then gamble in turn. Following this, the possible
+winning amounts he can have at any point in the game are <span class="math inline">\({\$0, \$1, \$2, \$4, \$8}\)</span>. Where the
+results of $0 or $8 are both absorbing states</p>
+<pre class="r"><code>transition_matrix &lt;- matrix(c(1, 0, 0, 0, 0,
+                              0.6, 0, 0.4, 0, 0,
+                              0.6, 0, 0, 0.4, 0,
+                              0.6, 0, 0, 0, 0.4,
+                              0, 0, 0, 0, 1), ncol=5,nrow=5)
+
+rownames(transition_matrix) &lt;- c(&quot;$0&quot;, &quot;$1&quot;, &quot;$2&quot;, &quot;$4&quot;, &quot;$8&quot;)
+colnames(transition_matrix) &lt;- c(&quot;$0&quot;, &quot;$1&quot;, &quot;$2&quot;, &quot;$4&quot;, &quot;$8&quot;)
+# He starts with $1, so the probability vector for the amount of money he has only has an entry in the $1 position
+initial_state &lt;- c(0, 1, 0, 0, 0)</code></pre>
+<p>In order to win the game, Smith needs to win 3 times in a row. If he
+loses at any point, he goes bust (because under the
+<strong>bold</strong> strategy, he is betting his sum until $4, after
+which he either wins or loses).</p>
+<p><span class="math display">\[
+$\1 \rightarrow \$2 \rightarrow \$4 \rightarrow \$8
+\]</span></p>
+<pre class="r"><code>x &lt;- initial_state
+for (i in 1:3){
+  x &lt;- transition_matrix %*% x
+ 
+}
+
+(p_bold &lt;- unname(x[&quot;$8&quot;, ]) )</code></pre>
+<pre><code>## [1] 0.064</code></pre>
+<p>The probability of him ending with $8 ends up at <span class="math inline">\(0.064\)</span>.</p>
+<p>We can verify this result</p>
 </div>
-<div id="expected-value-and-variance-of-exponential-distribution" class="section level2">
-<h2>Expected Value and Variance of Exponential Distribution</h2>
-<p>We know based on the definition of a random variable <span class="math inline">\(X\)</span> having an <a href="https://en.wikipedia.org/wiki/Exponential_distribution">exponential
-distribution</a> that the density function looks like:</p>
-<span class="math display">\[\begin{aligned}
-  f_X(x) = \begin{cases}
-    \lambda e^{-\lambda x} &amp; \text{if } x \ge 0\\
-    0  &amp;otherwise
-  \end{cases}
-\end{aligned}\]</span>
-<p>We first calculate the moment generating function:</p>
-<span class="math display">\[\begin{aligned}
-  M_x(t) = \int_{0}^{\infty}e^{tx}f(x)\,dx \newline
-         = \int_{0}^{\infty}e^{tx} \lambda e^{-\lambda x}\,dx \newline
-         = \lambda \int_{0}^{\infty}e^{tx} e^{-\lambda x}\,dx \newline
-         =  \lambda \int_{0}^{\infty} e^{x(t -\lambda )}\,dx
-\end{aligned}\]</span>
-<p>Integrating with respect to <span class="math inline">\(x\)</span>,
-we get</p>
-<span class="math display">\[\begin{aligned}
-  M_x(t) = \frac{-\lambda}{t - \lambda} e^{x(t - \lambda)}
-\rvert_{0}^{\infty} \newline
-         = \frac{-\lambda}{t - \lambda}\left ( e^{\infty(t - \lambda)} -
-e^0\right)
-\end{aligned}\]</span>
-<p>The above expression converges only in the case where <span class="math inline">\(t &lt; \lambda\)</span>, because then the
-exponential argument in the first term does not diverge. Taking this
-constraint into account, we can simplify to get:</p>
-<span class="math display">\[\begin{aligned}
-  M_x(t) = \frac{-\lambda}{t - \lambda}, t &lt; \lambda
-\end{aligned}\]</span>
-<p>We can differentiate to find the first moment (and consequently the
-expected value of our exponential distribution):</p>
-<span class="math display">\[\begin{aligned}
-  E(X) = \mu_1 = M_x&#39;(0) = -\lambda \frac{d}{\,dt}((t - \lambda)^-1)
-\rvert_{t = 0} \newline
-       = \frac{\lambda}{(t - \lambda)^2} \rvert_{t = 0}
-       = \frac{\lambda}{\lambda^2} = \frac{1}{\lambda}
-\end{aligned}\]</span>
-<p>Which aligned with what <a href="https://en.wikipedia.org/wiki/Exponential_distribution#Mean,_variance,_moments,_and_median">we
-know about exponential distributions</a></p>
-<p>We now can find the variance by finding <span class="math inline">\(\mu_2\)</span>, then plugging into our variance
-formula: <span class="math inline">\(\sigma^2 = \mu_2 -
-\mu_1^2\)</span></p>
-<span class="math display">\[\begin{aligned}
-  \mu_2 = M_x&#39;&#39;(0) = \frac{d}{\,dt}\left[ \frac{\lambda}{(t -
-\lambda)^2}\right] \rvert_{t=0} \newline
-        = \frac{-2\lambda}{(t - \lambda)^3} \rvert_{t=0} \newline
-        = \frac{-2\lambda}{\lambda^3} \newline
-        = \frac{2}{\lambda^2}
-\end{aligned}\]</span>
-<p>Now we can get our variance value</p>
-<span class="math display">\[\begin{aligned}
-  Var(x) = \sigma^2 = \mu_2 - \mu_1^2 = \frac{2}{\lambda^2} -
-(\frac{1}{\lambda})^2 = \frac{1}{\lambda^2}
-\end{aligned}\]</span>
+<div id="optimal-strategy" class="section level3">
+<h3>Optimal Strategy</h3>
+<p>For this setup, the <strong>bold</strong> strategy is optimal for
+Smith, as it results <span class="math inline">\(p_{bold} &gt;
+p_{timid}\)</span></p>
+<pre class="r"><code>p_bold &gt; p_timid</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+</div>
 </div>
 
 

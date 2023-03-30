@@ -1,0 +1,86 @@
+---
+title: "DATA605 Problem Set 10"
+author: "Andrew Bowen"
+date: "2023-03-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Problem
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars.
+A guard agrees to make a series of bets with him. If Smith bets $A$ dollars, he wins A dollars with probability $0.4$ and loses $A$ dollars with probability $0.6$. Find the probability that he wins 8 dollars before losing all of his money if:
+a. He bets 1 dollar each time (*timid strategy*).
+b. He bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars (*bold strategy*).
+c. Which strategy gives Smith the better chance of getting out of jail?
+
+### Timid Strategy
+We can use the probability of reaching our "winning sum" ($M$) of $8 from the gambler's ruin section of [our textbook](https://math.dartmouth.edu/~prob/prob/prob.pdf) (Chapter 12.2):
+\begin{aligned}
+  P = \frac{(\frac{q}{p})^s - 1}{(\frac{q}{p})^M - 1}
+\end{aligned}
+
+where $s$ is Smith's starting stake, $q$ is the probability of failure in a given turn, and $p$ is the probability of success in a given turn. We can plug into our formula with the following R code:
+```{r}
+p <- 0.4
+q <- 0.6
+M <- 8
+s <- 1
+
+# Calculate probability of reaching $8 with timid strategy
+(p_timid <- ((q / p)**s - 1) / ((q / p)**M - 1))
+```
+
+```{r}
+library(markovchain)
+```
+
+```{r}
+
+```
+
+
+### Bold Strategy
+In this case, the amount gambled depends on the amount of money Smith has in his possession (his winnings up until that point). Let's start with the case that he starts with $s = \$1$. Assuming whole dollar bets, he will gamble \$1 in the first turn ($k=1$). If he wins, he will have \$2, which he will then gamble in turn. Following this, the possible winning amounts he can have at any point in the game are ${\$0, \$1, \$2, \$4, \$8}$. Where the results of \$0 or \$8 are both absorbing states
+
+```{r}
+transition_matrix <- matrix(c(1, 0, 0, 0, 0,
+                              0.6, 0, 0.4, 0, 0,
+                              0.6, 0, 0, 0.4, 0,
+                              0.6, 0, 0, 0, 0.4,
+                              0, 0, 0, 0, 1), ncol=5,nrow=5)
+
+rownames(transition_matrix) <- c("$0", "$1", "$2", "$4", "$8")
+colnames(transition_matrix) <- c("$0", "$1", "$2", "$4", "$8")
+# He starts with $1, so the probability vector for the amount of money he has only has an entry in the $1 position
+initial_state <- c(0, 1, 0, 0, 0)
+```
+
+In order to win the game, Smith needs to win 3 times in a row. If he loses at any point, he goes bust (because under the **bold** strategy, he is betting his sum until \$4, after which he either wins or loses).
+
+$$
+$\1 \rightarrow \$2 \rightarrow \$4 \rightarrow \$8
+$$
+
+
+```{r}
+x <- initial_state
+for (i in 1:3){
+  x <- transition_matrix %*% x
+ 
+}
+
+(p_bold <- unname(x["$8", ]) )
+```
+
+The probability of him ending with \$8 ends up at $0.064$.
+
+
+We can verify this result
+
+### Optimal Strategy
+For this setup, the **bold** strategy is optimal for Smith, as it results $p_{bold} > p_{timid}$
+```{r}
+p_bold > p_timid
+```

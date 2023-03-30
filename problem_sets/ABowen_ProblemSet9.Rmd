@@ -42,7 +42,7 @@ c. $Y_{365} \ge 120$
 ```
 
 ## Expected Value and Variance of Binomial Distribution
-We start with a [binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution) for$k$ successes in $n$ trials with probability of success $p$
+We start with a [binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution) for $k$ successes in $n$ trials with probability of success $p$
 
 \begin{aligned}
   P(k: n, p) = {n \choose k}p^kq^{n-k}
@@ -82,7 +82,7 @@ Now that we have our moment generator function $M_k(t)$, we can differentiate to
        = np
 \end{aligned}
 
-This result aligns with what we know about the [properties of the binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution#Properties). Now to find the variance, we'll need to differentiate again. We also need to remember the definition of our vairance based off moments:
+This result aligns with what we know about the [properties of the binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution#Properties). Now to find the variance, we'll need to differentiate again. We also need to remember the definition of our variance based off moments:
 
 \begin{aligned}
   \sigma^2 = E(X^2) - E(X)^2 = \mu_2 - \mu_{1}^{2}
@@ -142,7 +142,7 @@ Integrating with respect to $x$, we get
 The above expression converges only in the case where $t < \lambda$, because then the exponential argument in the first term does not diverge. Taking this constraint into account, we can simplify to get:
 
 \begin{aligned}
-  M_x(t) = frac{-\lambda}{t - \lambda}, t < \lambda
+  M_x(t) = \frac{-\lambda}{t - \lambda}, t < \lambda
 \end{aligned}
 
 We can differentiate to find the first moment (and consequently the expected value of our exponential distribution):
