@@ -383,10 +383,11 @@ print(oz_matrix)</code></pre>
 ## S 0.25 0.25 0.50</code></pre>
 <p>Based on Theorem 11.2, if <span class="math inline">\(P\)</span> is
 our transition matrix, Then the probability that the chain is in state
-<span class="math inline">\(s_i\)</span> after <span class="math inline">\(n\)</span> steps is the <span class="math inline">\(i^{th}\)</span> entry in the vector:</p>
-<span class="math display">\[\begin{aligned}
+<span class="math inline">\(s_i\)</span> after <span class="math inline">\(n\)</span> steps is the <span class="math inline">\(i^{th}\)</span> entry in the vector: <span class="math display">\[
+\begin{aligned}
   \textbf{$u^{(n)}$} = \textbf{u}P^n
-\end{aligned}\]</span>
+\end{aligned}
+\]</span></p>
 <p>For the case where <span class="math inline">\(\textbf{u} = (0, 1,
 0)\)</span>:</p>
 <pre class="r"><code>u &lt;- c(0, 1, 0)

@@ -80,7 +80,7 @@ The probability of him ending with \$8 ends up at $0.064$.
 We can verify this result
 
 ### Optimal Strategy
-For this setup, the **bold** strategy is optimal for Smith, as it results $p_{bold} > p_{timid}$
+For this setup, the **bold** strategy is optimal for Smith, as it results $p_{bold} > p_{timid}$. In other words, it gives a higher probability of him reaching his target value than the timid strategy.
 ```{r}
 p_bold > p_timid
 ```

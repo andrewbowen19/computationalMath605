@@ -3,8 +3,8 @@ title: "DATA605 Discussion Post Week 10"
 author: "Andrew Bowen"
 date: "2023-03-29"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
