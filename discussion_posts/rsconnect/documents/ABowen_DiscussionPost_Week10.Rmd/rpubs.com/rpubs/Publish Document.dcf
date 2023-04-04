@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/1021948/21f6a522214941c1a80496e0027e1d19
+bundleId: https://api.rpubs.com/api/v1/document/1021948/21f6a522214941c1a80496e0027e1d19
+url: http://rpubs.com/andrewbowen19/1021948
+when: 1680465158.34749
+lastSyncTime: 1680465158.34751

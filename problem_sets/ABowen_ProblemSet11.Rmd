@@ -1,0 +1,76 @@
+---
+title: 'DATA 605 Problem Set 11: Regression'
+author: "Andrew Bowen"
+date: "2023-04-04"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+
+```{r libraries, echo=FALSE, message=FALSE}
+library(ggplot2)
+```
+
+# Load the Cars Dataset
+First, let's load the built-in `cars` dataset to a native R dataframe
+```{r}
+df <- as.data.frame(cars)
+
+head(df)
+```
+
+# Model Creation
+We can use R's built-in linear model (`lm`) to create
+```{r linear-model}
+model <- lm(cars$dist ~ cars$speed)
+
+summary(model)
+```
+# Model Analysis
+There's 3 main criteria we need to consider when creating (and evaluating) a linear model:
+
+1. **Linear relationship** - the dependent variable should have a roughly linear relationship to an independent variable
+2. **Homoscedasticity** - the variance of our residuals as a function of our residuals as a function of the independent variable is constant
+3. **Independence of Errors** - there's no pattern/correlation between residuals
+
+
+Let's plot our linear model using the [`geom_abline` functino from `ggplot2`](https://stackoverflow.com/questions/15633714/adding-a-regression-line-on-a-ggplot)
+```{r}
+# Plotting our datapoints overlaid with our linear model
+c <- coef(model)
+ggplot(df, aes(x=speed, y=dist)) + geom_point() + 
+  geom_abline(slope = c[["cars$speed"]], 
+              intercept =c[["(Intercept)"]])
+```
+This plot looks roughly linear, so our condition of a **linear relationship** is met. 
+
+Next, let's [plot the distribution of residuals](https://www.statology.org/residual-plot-r/) of our model. It's important that our residuals are normally distributed, as that's a main criterion for simple linear regression, as it helps us check the condition of homoscedasticity
+
+```{r}
+res <- resid(model) #alternatively, model$residuals
+hist(res)
+```
+The above histogram looks roughly normal by the eye test. We can also plot our residuals as a function of our model's predicted values ($\hat{y}$)
+
+
+```{r}
+plot(fitted(model), res)
+```
+There's no clear pattern in this plot, though we should verify further that our residuals are normally distributed.
+
+We should also generate a [Q-Q plot](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjiuLH5g4_-AhVtkokEHU6JADwQFnoECCQQAw&url=https%3A%2F%2Fwww.itl.nist.gov%2Fdiv898%2Fhandbook%2Feda%2Fsection3%2Fqqplot.htm&usg=AOvVaw0UviTcbFvXC_TQNshh80Ek) to help in determining if our residuals follow a normal distribution. In this framework, the plotted residuals *should* be linear, which appears to be the case with the exception of the right tail of the distribution.
+```{r}
+# Create Q-Q plot of our residuals
+qqnorm(res)
+qqline(res)
+```
+
+We can also produce a [panel plot of diagnostic charts as in our textbook example](https://conservancy.umn.edu/bitstream/handle/11299/189222/LinearRegressionUsingR2ed_fulltext.pdf?sequence=12&isAllowed=y)
+```{r}
+par(mfrow=c(2,2))
+plot(model)
+```
+
+
