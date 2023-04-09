@@ -1,0 +1,141 @@
+---
+title: 'DATA 605 Problem Set 12: Multiple Regression'
+author: "Andrew Bowen"
+date: "2023-04-09"
+output: html_document
+---
+
+```{r message=FALSE, echo=FALSE}
+library(ggplot2)
+```
+
+Read-in our CSV data
+```{r}
+# TODO: replace local file path with GitHub URL
+df <- read.csv("~/CUNY/computationalMath605/data/real-world-data.csv")
+
+head(df)
+```
+
+
+
+1. Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the variables. Provide and interpret the F statistics, R^2, standard error, and p-values only. Discuss whether the assumptions of simple linear regression met.
+
+```{r}
+ggplot(df, aes(x=LifeExp, y=TotExp)) + geom_point()
+```
+
+Let's run a simple linear regression on these two variables using the R methods `lm` and `summary`
+
+```{r simple-linear-model}
+linModel <- lm( LifeExp~TotExp, df)
+
+summary(linModel)
+```
+
+The adjusted $R^2$ value states that $25.37\%$ of our output variable (`TotExp`) can be explained by our input variable (`LifeExp`). The p-value ($7.71 x 10^{-14}$) indicates the probability of our model producing coefficients *more* extreme than those produced. The `F-statistic` value compares our model to a model with only an intercept parameter. Per our regression text, we only have one additional parameter. The Standard Error listed shows the statistical standard error for each coefficient listed (`Intercept` and `TotExp`)
+
+#### Assumptions for Regression
+
+- **Linear Relationship**:The data, as plotted above, do not exhibit a linear relationship visually. From a quick "eye test", an exponential function may model this data better
+- **Residuals are normally distributed**: We'll plot the distribution of residuals below. They do **not** appear normally distributed as the hitogram is skewed left
+```{r}
+res <- resid(linModel) #alternatively, model$residuals
+hist(res)
+```
+Finally, we can generate a QQ-plot to check our assumptions for regression
+```{r}
+# Create Q-Q plot of our residuals
+qqnorm(res)
+qqline(res)
+```
+This plot does not exhibit linear behavior. In this case a linear regression model **does not** fit our data well
+
+
+2.  *Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06 power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r re-run the simple regression model using the transformed variables. Provide and interpret the F statistics, R^2, standard error, and p-values. Which model is "better"?*
+
+
+```{r}
+df$LifeExpRaised <- df$LifeExp ^ 4.6
+df$TotExpRaised <- df$TotExp ^ 0.06
+
+head(df)
+```
+
+```{r}
+# Plotting our variables raised to their respective powers
+ggplot(df, aes(x=LifeExpRaised, y=TotExpRaised)) + geom_point()
+```
+
+This dataset looks much more linear. Let's run our linear model on this data and the interpret our `summary`
+```{r simple-linear-model-raised}
+linModelRaised <- lm( LifeExpRaised~TotExpRaised, df)
+
+summary(linModelRaised)
+```
+
+In this case, we see a much lower p-value (on the order of $10^{-16}$ rather than $10^{-14}$). This is important because it means our model "covers" a larger portion of the distribution of output values. The F-statistic is also higher, meaning that model compares more favorably than our `linModel` if both had no independent parameters (in other words, only the intercept value). The standard error of our coefficients is larger, but that is because the scale our our data is much larger, because we raised the `LifeExp` variable to a higher power.
+
+Overall, our `linModelRaised` is a "better" model as it is modelling data that visually looks more linear. This results in a better fit from a linear model
+
+
+
+
+
+3. *Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life expectancy when TotExp^.06=2.5.*
+
+
+Using R's built-in `predict` function, we can pass our `linModelRaised` as well as a dataframe of our new `TotExp` values
+```{r}
+# 
+newExp <- data.frame(TotExpRaised=c(1.5, 2.5))
+predict(linModelRaised, newdata = newExp)
+```
+
+
+4. *Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?*
+`LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp`
+
+
+We can use the `mlm` model as this model takes more than one predictor variable (multiple regression)
+```{r}
+# Storing our last term as a product column
+df$mDExp <- df$PropMD * df$TotExp
+
+# build the multiple regression model
+mlm <- lm(LifeExp ~ PropMD + TotExp + mDExp, df)
+```
+
+Let's look at and interpret our summary stas on this model
+```{r}
+summary(mlm)
+```
+
+```{r}
+mresid <- resid(mlm)
+hist(mresid)
+```
+
+
+
+5. Forecast `LifeExp` when $PropMD=0.03$ and $TotExp = 14$. Does this forecast seem realistic? Why or why not?
+
+```{r}
+multiNewData <- data.frame(PropMD=0.03, TotExp = 14)
+multiNewData$mDExp <- multiNewData$PropMD * multiNewData$TotExp
+
+# Predicting with our given values
+predict(mlm, multiNewData)
+```
+
+While this predicted value is *possible*, it seems a bit high to be realistic. In part
+
+```{r}
+hist(resid(mlm))
+```
+
+Looking at the above, the residuals from our multiple regression model appear to be skew-left. We can also see this pattern in our residual values from our fitted values below. This would violate our assumption of heteroscedasticity. This could result in a model that does not produce an ideal fit. In part, the data we're working with here were not scaled up as in step *2*, resulting in a poorer fit from our model.
+
+```{r}
+plot(fitted(mlm), resid(mlm))
+```

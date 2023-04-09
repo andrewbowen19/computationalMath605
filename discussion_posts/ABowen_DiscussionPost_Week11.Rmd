@@ -1,0 +1,62 @@
+---
+title: 'DATA605: Discussion Post Week 11'
+author: "Andrew Bowen"
+date: "2023-04-04"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# Dataset
+For this exercise, I chose the `faithful` dataset which is available as an R dataset
+
+
+First, let's load the built-in `cars` dataset to a native R dataframe
+```{r}
+df <- as.data.frame(faithful)
+
+head(df)
+```
+
+# Model Creation
+Let's use the built-in `lm` function from R
+```{r linear-model}
+# creating our model of eruption duration as a function of wait time
+model <- lm(faithful$eruptions ~ faithful$waiting)
+
+summary(model)
+```
+
+# Model Analysis
+Let's plot our data as well as our model line
+```{r}
+plot(faithful$waiting, faithful$eruptions)
+abline(model)
+```
+There appears to be a general linear relationship between these variables in this plot. We should continue to analyze our assumptions for regression.
+
+Next, let's plot the distribution of our residuals via a histogram
+```{r}
+res <- resid(model) #alternatively, model$residuals
+hist(res)
+```
+This distribution is slightly skewed, but looks to be relatively normal from an eye test
+
+Next let's plot our residuals as a function of our predicted values
+```{r}
+plot(fitted(model), res)
+```
+There appears to be a slight pattern in these residuals, as there looks to be two clusters of data within our residuals plot
+
+Lastly, we can create a Q-Q plot to evaluate the normality of our residuals.
+```{r}
+# Create Q-Q plot of our residuals
+qqnorm(res)
+qqline(res)
+```
+
+
+While this is relatively linear as a Q-Q plot, the tails of the distribution wander away from our normalization line. Overall, a linear model fits the data and meets the assumptions of regression, but the clustering behavior displayed above leads me to believe a different model may be appropriate for this dataset.
+
+
