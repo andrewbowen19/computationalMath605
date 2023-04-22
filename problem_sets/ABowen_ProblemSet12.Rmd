@@ -67,7 +67,7 @@ head(df)
 ggplot(df, aes(x=LifeExpRaised, y=TotExpRaised)) + geom_point()
 ```
 
-This dataset looks much more linear. Let's run our linear model on this data and the interpret our `summary`
+This dataset looks to have a much more linear relationship. Let's run our linear model on this data and the interpret our `summary` statistics.
 ```{r simple-linear-model-raised}
 linModelRaised <- lm( LifeExpRaised~TotExpRaised, df)
 
@@ -78,14 +78,9 @@ In this case, we see a much lower p-value (on the order of $10^{-16}$ rather tha
 
 Overall, our `linModelRaised` is a "better" model as it is modelling data that visually looks more linear. This results in a better fit from a linear model
 
-
-
-
-
 3. *Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life expectancy when TotExp^.06=2.5.*
 
-
-Using R's built-in `predict` function, we can pass our `linModelRaised` as well as a dataframe of our new `TotExp` values
+Using R's built-in `predict` function, we can pass our `linModelRaised` object as well as a dataframe of our new `TotExp` values
 ```{r}
 # 
 newExp <- data.frame(TotExpRaised=c(1.5, 2.5))
@@ -96,7 +91,6 @@ predict(linModelRaised, newdata = newExp)
 4. *Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?*
 `LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp`
 
-
 We can use the `mlm` model as this model takes more than one predictor variable (multiple regression)
 ```{r}
 # Storing our last term as a product column
@@ -106,7 +100,7 @@ df$mDExp <- df$PropMD * df$TotExp
 mlm <- lm(LifeExp ~ PropMD + TotExp + mDExp, df)
 ```
 
-Let's look at and interpret our summary stas on this model
+Again, let's look at and interpret our summary stats on this model
 ```{r}
 summary(mlm)
 ```
@@ -116,10 +110,9 @@ mresid <- resid(mlm)
 hist(mresid)
 ```
 
-
-
 5. Forecast `LifeExp` when $PropMD=0.03$ and $TotExp = 14$. Does this forecast seem realistic? Why or why not?
 
+Again, we can use the `predict` method here for these new input values.
 ```{r}
 multiNewData <- data.frame(PropMD=0.03, TotExp = 14)
 multiNewData$mDExp <- multiNewData$PropMD * multiNewData$TotExp
@@ -128,14 +121,20 @@ multiNewData$mDExp <- multiNewData$PropMD * multiNewData$TotExp
 predict(mlm, multiNewData)
 ```
 
-While this predicted value is *possible*, it seems a bit high to be realistic. In part
+While this predicted value is *possible*, it seems a bit high to be realistic. In part, a life expectancy over 100 years does not seem like a reasonable value, knowing how rare it is for people to live to over 100 years.
 
 ```{r}
 hist(resid(mlm))
 ```
 
-Looking at the above, the residuals from our multiple regression model appear to be skew-left. We can also see this pattern in our residual values from our fitted values below. This would violate our assumption of heteroscedasticity. This could result in a model that does not produce an ideal fit. In part, the data we're working with here were not scaled up as in step *2*, resulting in a poorer fit from our model.
-
+Looking at the above, the residuals from our multiple regression model appear to be skew-left. We can also see this pattern in our residual values from our fitted values below. This would violate our assumption of heteroscedasticity. This could result in a model that does not produce an ideal fit. In part, the data we're working with here were not scaled up as in step *2*, resulting in a poorer fit from our linear model.
 ```{r}
 plot(fitted(mlm), resid(mlm))
 ```
+
+We can also use the `plot.lm` function in order to generate these graphs with a single function call
+```{r}
+plot(mlm)
+```
+
+

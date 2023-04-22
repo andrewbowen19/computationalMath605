@@ -1,0 +1,75 @@
+---
+title: 'DATA605: Discussion Post Week 12'
+author: "Andrew Bowen"
+date: "2023-04-19"
+output: html_document
+---
+
+# Multiple Regression
+```{r echo=FALSE, message=FALSE}
+library(stats)
+library(lmtest)
+```
+
+
+We can use the `Seatbelts` dataset built into R. First, we can set it up as a dataframe in R
+```{r}
+# Load the dataset into a dataframe
+df <- as.data.frame(Seatbelts)
+```
+
+
+We can use the `law` variable as our dichotomous value, as this takes a value of 0 or 1, depending on if the seatbelt law was in effect that month. We want to predict the value of `DriversKilled`, which will be our *dependent variable*. We can use the `front` variable as our quadratice term, and the `kms` (distance driven) as our quantitative term
+
+```{r}
+# set up the number of front-seat passengers killed as our quantitative term
+df$front2 <- df$front ** 2
+```
+
+
+Now, we can create our linear model
+```{r}
+mlm <- lm(DriversKilled ~ front2 + kms + law, df)
+
+summary(mlm)
+```
+The coefficients represent the weights for each term in our model. For each input variable, an increase of one "unit" will increase our dependent variable by $9.260x10^1$. The $R^2$ value tells us the amount of variability in our dependent variable that can be accounted for by our independent variables.
+
+Our F-statistic compares our model to a model with no independent variables. Since our p-value for this F-statistic is less than the typical significance level ($\alpha=0.05$), we can accept the alternative hypothesis that our model outperforms a model with no independent variables
+
+### Testing our Regression Assumptions
+
+```{r}
+# Plotting our variables to see if there's a general linear relationship
+df$x <- df$front2 + df$law + df$front
+
+plot(df$x, df$DriversKilled)
+```
+The above plot looks to show a general linear relationship between our dependent variable (`DriversKilled`) and our independent variables
+
+
+We can use the `plot.lm` function to plot the needed graphs for testing our regression assumptions.
+```{r}
+plot(mlm)
+```
+
+Our QQ-plot is relatively linear from an eye test, and there does not appear to be any pattern in our plot of residuals vs fitted values as well. 
+
+#### Normality of residuals
+```{r}
+hist(mlm$residuals)
+```
+
+This plot *looks* linear, but it'd be nice to quantify this a bit more. From last week's discussion board, we can use a [*Schapiro-Wilk test*](https://www.sciencedirect.com/topics/mathematics/wilk-test#:~:text=The%20Shapiro–Wilk%20test%20is%20essentially%20a%20goodness%2Dof%2D,standard%20deviation%20σ%20%3D%201%20) to 
+```{r}
+shapiro.test(mlm$residuals)
+```
+Our p-value is higher than our significance level of 0.05, so we can **not** reject the null hypothesis that our residuals are not normally distributed
+
+#### Homoscedasticity
+From last week's discussion, we can test the assumption of homoscedasticity (equal variance of residuals for each value of our predictor variables) with a [Breusch-Pagan test](https://www.statology.org/breusch-pagan-test/). We can use the `bptest` in R from the `lmtest` library to test this assumption at a significance level of $\alpha=0.05$
+```{r}
+bptest(mlm)
+```
+
+Since our p-value is less than 0.05, we can assume homoscedasticity.
