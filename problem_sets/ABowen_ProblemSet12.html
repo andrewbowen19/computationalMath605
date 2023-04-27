@@ -518,7 +518,7 @@ TotExp^.06=2.5.</em></li>
 <p>Using R’s built-in <code>predict</code> function, we can pass our
 <code>linModelRaised</code> object as well as a dataframe of our new
 <code>TotExp</code> values</p>
-<pre class="r"><code># 
+<pre class="r"><code># predicting new values between LifeExp and TotExp
 newExp &lt;- data.frame(TotExpRaised=c(1.5, 2.5))
 predict(linModelRaised, newdata = newExp)</code></pre>
 <pre><code>##         1         2 

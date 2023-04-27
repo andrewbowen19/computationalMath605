@@ -1,0 +1,154 @@
+---
+title: 'DATA605: Problem Set 13'
+author: "Andrew Bowen"
+date: "2023-04-26"
+output: html_document
+---
+
+# Question 1
+Let's pick our substitution function $u = -7x$, so $\frac{\,du}{\,dx} = -7$, meaning $\frac{\,du}{-7} = \,dx$. Plugging in we get
+\begin{aligned}
+  \int 4e^{-7x}\,dx = 4\int e^{-7x} \,dx\newline
+                    = 4\int \frac{1}{-7}e^{u} \,du\newline
+                    = \frac{-4}{7}\int e^u \,du \newline
+                    = \frac{-4}{7}e^u + C = \frac{-4}{7}e^{-7x} + C
+\end{aligned}
+
+# Question 2
+We can compute the indefinite integral of $\frac{dN}{dt}$ to get an expression for $N(t)$. From there we can use our boundary condition ($N(1) = 6530$) to find an expression
+
+\begin{aligned}
+  N(t) = \int \frac{-3150}{t^4} - 220 \,dx = \frac{3150}{4t^5} + C
+\end{aligned}
+
+Now we can plug in our boundary condition to find our constant of integration $C$.
+```{r biology}
+(C <- 6530 - (3150 / 4))
+```
+Making our final expression for the number of bacteria per day: $N(t) = \frac{3150}{t^5} + 5742.5$
+```{r bacteria-check}
+N <- function(t){
+  3150/(t^5) + C
+}
+
+N_prime <- deriv(expression(N), "t")
+```
+
+# Question 3
+```{r}
+f <- function(x){
+  2 * x - 9
+}
+
+x_vals <- c(5, 6, 7, 8)
+
+# Iterate over rectangles (width = 1). and sum up area of riemann rectangles
+area <- 0 
+for (x in x_vals){
+  rect_area <- 1 * f(x)
+  area <- area + rect_area
+}
+
+print(area)
+```
+
+
+# Question 4
+Let's define our functions in question as:
+
+\begin{aligned}
+  g(x) = x + 2\newline
+  h(x) = x^2 - 2x - 2
+\end{aligned}
+
+We can solve this by finding where these functions equal each other ($g(x) = h(x)$), then subtract the definite integral of each function over that interval (assuming only 2 intercepts)
+```{r}
+g <- function(x){
+  x + 2
+}
+h <- function(x){
+  x^2 - 2*x - 2
+}
+
+# Plotting our functions
+curve(h, from =-5, to=5, col=2)
+curve(g, from =-5, to=5,  col=3, add=TRUE)
+```
+
+Visually, it looks like these functions intersect at $x = -1, 4$. We can solve this intersect analytically:
+
+\begin{aligned}
+  x + 2 = x^2 - 2x - 2\nelwine
+  0 = x^2 - 3x - 4
+  0 = (x - 4)(x - 1)
+\end{aligned}
+
+Confirming our intuition above, this equation has roots at $x = -1, 4$.
+
+```{r, area-between-curves}
+x1 <- -1
+x2 <- 4
+
+int_g <- integrate(g, x1, x2)
+int_h <- integrate(h, x1, x2)
+
+(area <- int_g[1]$value - int_h[1]$value)
+```
+
+# Question 5
+Let $x$ be the number of flat irons per order, and $n$ be the number of orders. This means that $nx = 110$. Let's also introduce the below functions for the cost of storage ($S(x)$) and ordering $\Gamma(X)$. 
+
+\begin{aligned}
+  S(x) = 3.75x\newline
+  \Gamma(x) = 8.75\frac{110}{x}
+\end{aligned}
+
+Let the total cost function be $C(x) = S(x) + \Gamma(x) = 3.75x + \frac{962.5}{x}$. To find a minimal cost as a function of flat irons ordered, we'll need to find where $C'(x) = 0$
+
+\begin{aligned}
+  C'(x) = 3.75 - \frac{962.5}{x^2}\newline
+      0 = 3.75 - \frac{962.5}{x^2}\newline
+      3.75 = \frac{962.5}{x^2}
+      x = 16.02
+\end{aligned}
+
+Now, plugging in for $n$, rounding x to 16
+
+\begin{aligned}
+  nx = 110\newline
+  n(16) = 110
+  n = 6.875
+\end{aligned}
+
+# Question 6
+First, let's choose our $u$ and $v$ parts of our integral. Let 
+
+\begin{aligned}
+  u = \ln(9x)\newline
+  v = x^6\newline
+  \,du = \frac{9}{x}\,dx
+\end{aligned}
+
+We can plug into the integration by parts formula:
+
+\begin{aligned}
+  \int u\,dv = uv - \int v\,du\newline
+             = \ln(9x)x^6 - \int x^6\frac{9}{x}\,dx\newline
+             =  \ln(9x)x^6 - 9\int x^5 \,dx\newline
+             =  \ln(9x)x^6 - \frac{3}{2}x^6 + C
+\end{aligned}
+
+# Question 7
+We can check if a function over a given integral is a probability density by integrating the function over that integral. If the expression evaluates to 1, we have a probability density function:
+
+```{r pdf}
+f <- function(x){
+  return(1 / (6 * x))
+}
+
+# Now let's integrate over our interval
+(i <- integrate(f, 1, exp(6)))
+```
+
+Since our integral evaluates to 1, our function $f(x) = \frac{1}{6x}$ is a PDF on the interval $[1, e^6]$
+

@@ -82,7 +82,7 @@ Overall, our `linModelRaised` is a "better" model as it is modelling data that v
 
 Using R's built-in `predict` function, we can pass our `linModelRaised` object as well as a dataframe of our new `TotExp` values
 ```{r}
-# 
+# predicting new values between LifeExp and TotExp
 newExp <- data.frame(TotExpRaised=c(1.5, 2.5))
 predict(linModelRaised, newdata = newExp)
 ```
