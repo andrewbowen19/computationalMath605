@@ -1,0 +1,45 @@
+---
+title: 'DATA605: Final Project'
+author: "Andrew Bowen"
+date: "2023-04-30"
+output: html_document
+---
+
+## Problem 1
+```{r}
+set.seed(1234)
+```   
+
+
+```{r}
+n <- 5
+lambda <- 8
+
+X <- dgamma(1:10000, shape=lambda, scale=n)
+```
+
+
+Calculating our sum of exponential distributions: `Y` and `Z`:
+```{r}
+Y <- 0
+for (i in 1:n){
+  Y <- Y + dexp(1:10000, rate=lambda)
+}
+
+Z <- dexp(1:10000, rate=lambda)
+```
+
+
+#### Expected value and variance of our PDFs
+```{r}
+print(mean(X))
+print(mean(Y))
+print(mean(Z))
+```
+
+```{r}
+print(var(X))
+print(var(Y))
+print(var(Z))
+```
+
