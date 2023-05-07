@@ -1,0 +1,63 @@
+---
+title: "DATA605 Problem Set 14: Taylor Series"
+author: "Andrew Bowen"
+date: "2023-05-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(calculus)
+```
+
+### Question 1
+Compute the taylor series (to order 4) of:
+\begin{aligned}
+  f(x) = \frac{1}{1-x}
+\end{aligned}
+
+We can use the `taylor` function included in the `calculus` library within R for this. The above functon is valid everywhere except $x=1$
+```{r}
+f1 <- function(x){ 1 / (1 - x)}
+
+taylor(f1, var="x", order=4)
+```
+
+
+
+### Question 2
+\begin{aligned}
+  f(x) = e^x
+\end{aligned}
+
+This function is valid everywhere within $(-\infty, \infty)$. We can calulate the Taylor series to n=4
+```{r}
+# f1 <- function(x){ 1 / (1 - x)}
+
+taylor("exp(x)", var="x", order=4)
+```
+
+### Question 3
+\begin{aligned}
+  f(x) = \log(1 + x)
+\end{aligned}
+This function is only defined when $x > -1$. We can compute the Taylor series, centered at 0
+```{r}
+f3 <- function(x){log(1 + x)}
+
+(t3 <- taylor(f3, var=0, order=4))
+```
+
+
+### Question 4
+\begin{aligned}
+  f(x) = x^{1/2} = \sqrt{x}
+\end{aligned}
+
+The above function is only valid and differentiable over the reals when $x > 0$. We can calculate the Taylor series centered at $x=1$, as that's a valid point of reference
+```{r}
+f4 <- function(x){sqrt(x)}
+
+(t4 <- taylor(f4, var=1, order=4))
+```
+
+
