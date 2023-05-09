@@ -10,6 +10,7 @@ library(tidyverse)
 library(MASS)
 library(car)
 library(lmtest)
+library(matrixcalc)
 ```
 
 ### Load our Datasets
@@ -42,9 +43,7 @@ ggplot(train, aes(x=LotArea, y=SalePrice)) + geom_point() + xlab("Lot Area (ft^2
 Generating a correlation matrix between our three quantitative variables above (`LotArea`, `TotalBsmtSF`, `SalePrice`)
 ```{r}
 
-corTrain <- cor(train[,c("LotArea", "TotalBsmtSF", "SalePrice") ])
-
-corTrain
+(corTrain <- cor(train[,c("LotArea", "TotalBsmtSF", "SalePrice") ]))
 ```
 
 Running `cor.test` for each permutation of quantitative variables above
@@ -60,7 +59,7 @@ for (i in colnames(corTrain)){
 ```
 
 
-For each combination of variables tested, we have p-values greater than our significance level ($\alpha = 0.2$). This indicates that we can not reject our null hypothesis that the true correlation between variables is equal to 0. 
+For each combination of variables tested, we have p-values greater than our significance level ($\alpha = 0.2$). This indicates that we can not reject our null hypothesis that the true population correlation between variables is equal to 0. 
 
 
 
@@ -69,9 +68,25 @@ For each combination of variables tested, we have p-values greater than our sign
 det(corTrain)
 ```
 
-Our determinant is **not** equal to 0, so we should be able to invert our correlation matrix
+Our determinant is **not** equal to 0, so we should be able to invert our correlation matrix. We can do this using the built-in `solve` function in R:
+```{r invert-cor-matrix}
+(invCor <- solve(corTrain))
+```
+```{r inv-matrix-multiply}
+corTrain %*% invCor
+```
+Accounting for some floating point errors, the above matrix product is the identity matrix, which holds for the multiplication of a matrix $A$ with its inverse $A^{-1}$: $I = AA^{-1}$
 
 
+LU Decomposition of our correlation matrix from above using the `matrixcalc` package
+```{r LU deomp}
+(LU <- lu.decomposition(corTrain))
+```
+Let's verify that our LU decomposition does in fact equal our original correlation matrix when multiplied together: $A = LU$
+```{r lu-verification}
+A <- LU$L %*% LU$U 
+A == corTrain
+```
 
 ### Calculus-Bases Probability & Statistics
 Let's use the `MasVnrArea` variable, which is definitely skew-right. We'll need to remove a few `NA` values from our data first
