@@ -5,6 +5,13 @@ date: "2023-04-30"
 output: html_document
 ---
 
+```{r libraries, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(MASS)
+library(car)
+library(lmtest)
+```
+
 ### Load our Datasets
 I uploaded the kaggle datasets to my GitHub, reading them here for reproducability.
 ```{r}
@@ -14,3 +21,151 @@ train_url <- "https://raw.githubusercontent.com/andrewbowen19/computationalMath6
 test <- read.csv(test_url)
 train <- read.csv(train_url)
 ```
+
+## Descriptive and Inferential Statistics
+
+```{r}
+summary(train)
+```
+
+Creating a scatter plot of the basement square footage and sale price ($)
+```{r}
+ggplot(train, aes(x=TotalBsmtSF, y=SalePrice)) + geom_point() + xlab("Basement Square Footage") + ylab("Sale Price ($)")
+```
+
+Creating another scatter plot between the lot area ($ft^2$) and `SalePrice`
+
+```{r}
+ggplot(train, aes(x=LotArea, y=SalePrice)) + geom_point() + xlab("Lot Area (ft^2)") + ylab("Sale Price ($)")
+```
+
+Generating a correlation matrix between our three quantitative variables above (`LotArea`, `TotalBsmtSF`, `SalePrice`)
+```{r}
+
+corTrain <- cor(train[,c("LotArea", "TotalBsmtSF", "SalePrice") ])
+
+corTrain
+```
+
+Running `cor.test` for each permutation of quantitative variables above
+```{r}
+for (i in colnames(corTrain)){
+  for (j in colnames(corTrain)){
+    if (i != j){
+      test <- cor.test(corTrain[,c(i)], corTrain[,c(j)], conf.level=0.8)
+      print(test)
+    }
+  }
+}
+```
+
+
+For each combination of variables tested, we have p-values greater than our significance level ($\alpha = 0.2$). This indicates that we can not reject our null hypothesis that the true correlation between variables is equal to 0. 
+
+
+
+### Linear Algebra and Correlation
+```{r}
+det(corTrain)
+```
+
+Our determinant is **not** equal to 0, so we should be able to invert our correlation matrix
+
+
+
+### Calculus-Bases Probability & Statistics
+Let's use the `MasVnrArea` variable, which is definitely skew-right. We'll need to remove a few `NA` values from our data first
+```{r}
+df <- train %>% filter(!is.na(MasVnrArea))
+qplot(df$MasVnrArea)
+```
+
+Calling `fitdistr` from the `MASS` package to fit our dataset variable to an exponential
+```{r}
+# Fit our distribution to an exponential
+fit <- fitdistr(df$MasVnrArea, "exponential")
+
+# Getting the rate poarameter lambda
+lambda <- fit$estimate[["rate"]]
+```
+
+Now let's generate random values with our `lambda` variable as the rate parameter
+```{r}
+dat <- rexp(1000, lambda)
+randValues <- as.data.frame(dat, col.names=character(1))
+
+
+hist(randValues[,1], col=rgb(0,0,1,0.5))
+hist(df$MasVnrArea, add=TRUE, col=rgb(1,0,0,0.5))
+
+```
+
+These both look to be skew-right with similar shapes (although the Kaggle data has a bit longer tail). Overall, these historgrams are similarly shaped and likely would have been pulled from the same distribution
+
+
+**Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF).**
+```{r}
+p5 <- pexp(0.05, rate=lambda)
+p95 <- pexp(0.95, rate=lambda)
+```
+
+Let's now [construct a 95% confidence interval](https://www.r-bloggers.com/2021/11/calculate-confidence-intervals-in-r/) from our Kaggle variable `MasVnrArea`. To do this we'll need our sample mean and standard deviation
+
+```{r conf-interval}
+n <- length(df$MasVnrArea)
+mu <- mean(df$MasVnrArea)
+sigma <- sd(df$MasVnrArea)
+
+margin <- qt(0.975,df=n-1)*sigma/sqrt(n)
+
+lower_interval <- mu - margin
+upper_interval <- mu + margin
+print(lower_interval)
+print(upper_interval)
+```
+
+Getting 5th and 95th percentile
+```{r}
+quantile(df$MasVnrArea, c(0.05, 0.95))
+```
+
+
+
+### Modeling
+
+```{r}
+mylm <- lm(SalePrice ~ FullBath + LotArea + OverallCond + GarageArea, train)
+
+
+summary(mylm)
+```
+
+```{r}
+plot(mylm)
+```
+
+#### Linear Regression Assumptions
+
+1. Linear Relationship
+It doesn't appear that our residuals have any relationship to our fitted values, per our first model plot above.
+
+2. Residuals are distributed normally
+We can check this assumption with our QQ-plot. The plot is generally linear in the middle of our residuals, but we can test this with a simple histogram and a [Shapiro Test](https://en.wikipedia.org/wiki/Shapiro–Wilk_test)
+```{r}
+hist(mylm$residuals)
+```
+
+```{r}
+shapiro.test(mylm$residuals)
+```
+Our p-value being less than a significance level of $\alpha=0.05$ indicates we can assume normality of our residuals.
+
+
+3. Homoscedasticity
+We can test this with a [Breush-Pagan test](http://math.furman.edu/~dcs/courses/math47/R/library/lmtest/html/bptest.html) in R
+```{r}
+bptest(mylm)
+```
+Our p-value being less than $\alpha=0.05$ means that we can reject the null hypothesis and claim that our variables meet the criterion of homoscedasticity.
+
+
