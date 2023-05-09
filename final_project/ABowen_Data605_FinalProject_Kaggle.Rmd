@@ -45,7 +45,6 @@ Generating a correlation matrix between our three quantitative variables above (
 
 (corTrain <- cor(train[,c("LotArea", "TotalBsmtSF", "SalePrice") ]))
 ```
-
 Running `cor.test` for each permutation of quantitative variables above
 ```{r}
 for (i in colnames(corTrain)){
@@ -60,8 +59,6 @@ for (i in colnames(corTrain)){
 
 
 For each combination of variables tested, we have p-values greater than our significance level ($\alpha = 0.2$). This indicates that we can not reject our null hypothesis that the true population correlation between variables is equal to 0. 
-
-
 
 ### Linear Algebra and Correlation
 ```{r}
