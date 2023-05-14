@@ -5,6 +5,11 @@ date: "2023-04-30"
 output: html_document
 ---
 
+```{r}
+library(tidyverse)
+```
+
+
 ## Problem 1
 ```{r}
 set.seed(1234)
@@ -15,7 +20,7 @@ set.seed(1234)
 n <- 5
 lambda <- 8
 
-X <- dgamma(1:10000, shape=lambda, scale=n)
+X <- rgamma(1:10000, shape=n, scale=1/lambda)
 ```
 
 
@@ -23,10 +28,10 @@ Calculating our sum of exponential distributions: `Y` and `Z`:
 ```{r}
 Y <- 0
 for (i in 1:n){
-  Y <- Y + dexp(1:10000, rate=lambda)
+  Y <- Y + rexp(1:10000, rate=lambda)
 }
 
-Z <- dexp(1:10000, rate=lambda)
+Z <- rexp(1:10000, rate=lambda)
 ```
 
 
@@ -42,4 +47,84 @@ print(var(X))
 print(var(Y))
 print(var(Z))
 ```
+
+```{r}
+qplot(Z)
+```
+
+### Question 1b
+Using calculus, calculate the expected value and variance of the Gamma pdf ($X$).  Using the moment generating function for exponentials, calculate the expected value of the single exponential (Z) and the sum of exponentials (Y)
+
+#### Gamma Distirbution 
+For the gamma distribution, the pdf is 
+
+\begin{aligned}
+  f(x; \alpha, \beta) = \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx
+\end{aligned}
+
+where $\Gamma(\alpha) = (\alpha - 1)!$. We can find the expected value:
+
+\begin{aligned}
+  E(X) = \int_0^{\infty} x \cdot  \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx
+\end{aligned}\newline
+       = \int_0^{\infty} \frac{\alpha}{\beta}\frac{\beta^{\alpha + 1}}{\Gamma(\alpha + 1)}x^{(\alpha + 1) - 1}e^{-\beta x} \,dx
+\end{aligned}
+
+We got to the step above using the fact that $\Gamma(a + 1) = a\Gamma(a)$. W ecan pull out our constants above and are left with the definition of the gamma distribution, which integrates to 1 over $(o, \infty)$
+
+\begin{aligned}
+  E(X) = \frac{\alpha}{\beta}\int_0^{\infty} \frac{\beta^{\alpha + 1}}{\Gamma(\alpha + 1)}x^{(\alpha + 1) - 1}e^{-\beta x} \,dx
+       = \frac{\alpha}{\beta}
+\end{aligned}
+
+#### Moment-generating function for exponentials
+Let's define our moment-generating function for the exponential distribution:
+
+\begin{aligned}
+  M_Z(t) = \frac{1}{1 - \frac{t}{\lambda}}, t < \lambda
+\end{aligned}
+
+We know the moment generating function of the exponential distribution, so we just need to take its first derivative and evaluate at $t=0$
+\begin{aligned}
+  \frac{\,dM}{\,dt} = \frac{d}{\,dt}(1 - \frac{t}{\lambda})^{-1} = \frac{1}{\lambda(1 - \frac{t}{\lambda})^2}
+\end{aligned}
+
+When we evaluate the above at $t=0$, we get $1/\lambda$, roughly in line with what we expect from our simulated data ($1/8 = 0.125$)
+```{r}
+mean(Z)
+```
+
+For the sum of exponentials (an [Eralng Distribution](https://en.wikipedia.org/wiki/Erlang_distribution)), we first need to figure out the moment generating function for the sum of exponentially-distributed random variables. We can use the property of moment generating functions that the sum of independent random variables produces a *product* moment generating function of the input variables $M_{X + Y}(t) = M_X(t)M_Y(t)$
+
+
+
+\begin{aligned}
+  M_Y(t) = (\frac{1}{1 - \frac{t}{\lambda}})^n
+\end{aligned}
+
+We can take the first derivative of this expression w.r.t $t$ and then evaluate at $t=0$ to find the expected value for our random variable $Y$
+
+\begin{aligned}
+  M_Y(t)\rvert_{t=0} = \frac{d}{\,dt} (\frac{1}{1 - \frac{t}{\lambda}})^n\rvert_{t=0} \newline
+                     = n(\frac{1}{1 - \frac{t}{\lambda}})(\frac{-1}{\lambda})\frac{-1}{1 - \frac{t}{\lambda}} \rvert_{t=0}\newline
+                     = n(1)\frac{1}{\lambda}(1) = \frac{n}{\lambda} 
+\end{aligned}
+This predicted value is pretty close to our simulated data mean
+```{r}
+print(n / lambda)
+
+print(mean(Y))
+```
+
+### Question 1c
+$P(Z > \lambda | Z > \lambda /2)$
+
+
+```{r}
+prob1c <- pgamma(1, shape= lambda / 2)
+```
+
+
+
+
 

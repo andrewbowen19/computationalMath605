@@ -50,8 +50,8 @@ Running `cor.test` for each permutation of quantitative variables above
 for (i in colnames(corTrain)){
   for (j in colnames(corTrain)){
     if (i != j){
-      test <- cor.test(corTrain[,c(i)], corTrain[,c(j)], conf.level=0.8)
-      print(test)
+      ctest <- cor.test(corTrain[,c(i)], corTrain[,c(j)], conf.level=0.8)
+      print(ctest)
     }
   }
 }
@@ -148,7 +148,6 @@ quantile(df$MasVnrArea, c(0.05, 0.95))
 ```{r}
 mylm <- lm(SalePrice ~ FullBath + LotArea + OverallCond + GarageArea, train)
 
-
 summary(mylm)
 ```
 
@@ -180,4 +179,9 @@ bptest(mylm)
 ```
 Our p-value being less than $\alpha=0.05$ means that we can reject the null hypothesis and claim that our variables meet the criterion of homoscedasticity.
 
+
+### Results
+```{r}
+colnames(test)
+```
 
