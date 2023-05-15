@@ -5,8 +5,9 @@ date: "2023-04-30"
 output: html_document
 ---
 
-```{r}
+```{r echo=FALSE, message=FALSE}
 library(tidyverse)
+library(hexbin)
 ```
 
 
@@ -119,12 +120,75 @@ print(mean(Y))
 ### Question 1c
 $P(Z > \lambda | Z > \lambda /2)$
 
+We can rewrite this as $P(Z > λ/2 ∩ Z > λ) / P(Z > λ/2)$. In this case, the numerator can be rewritten as $P(Z > λ/2 ∩ Z > λ) = P(Z > λ)$. Since wee can treat these as independent, we can multiply them separately $P(Z > λ/2)$ & $P(Z > λ)$. 
 
+First, let's find $P(Z > λ/2)$:
+
+\begin{aligned}
+  P(Z > λ/2) = 1 - P(Z \le \lambda) = 1 - F(\lambda)\newline
+             = 1 - (1 - e^{-λλ}) = e^{-λ}
+\end{aligned}
+
+We can use the cumulative distribution function for the exponential distribution $F(x) = 1 - e^{-\lambda x}$.
+
+Similarly, we can find $P(Z > λ/2) = 1 - F(λ/2) = 1 - (1 - e^(-λλ/2)) = e^(-λ/2)$. Dividing these, we get $e^{-\lambda / 2}$. Which we can plug in our value fo 8 to find the probability:
 ```{r}
-prob1c <- pgamma(1, shape= lambda / 2)
+(prob1c <- exp(-lambda / 2))
 ```
 
 
+#### Question 1d
+Similar to above, we can re-write the expression as $P(Z > 2λ) / P(Z > λ)$.
+
+\begin{aligned}
+  P(Z > 2\lambda) = 1 - (1 - e^{-\lambda2\lambda}) = e^{\lambda}
+  P(Z > λ) = 1 - (1 - e^-{\lambda\lambda}) = e^{-\lambda}
+\end{aligned}
+
+These two expressions divided by each other give a probability of 1. This makes sense given that Z must be greater than $\lambda$ to be greater than $2\lambda$.
+
+#### Question 1e
+$P(Z>3λ | Z> λ)$
+
+TODO: finish this CDF manipulation
 
 
+### Question 2
+*Loosely investigate whether P(YZ) = P(Y) P(Z) by building a table with quartiles and evaluating the marginal and joint probabilities.*
+First, let's get the different quartiles of our simulated values for Y and Z
+```{r quartile-y}
+quartiles_to_keep <- c("25%", "50%", "75%", "100%")
+(qY <- quantile(Y)[quartiles_to_keep])
+```
 
+
+```{r quartile-z}
+(qZ <- quantile(Z)[quartiles_to_keep])
+
+```
+
+Now let's matrix multiply our simulated datasets to get the possible pairwise products of `Y` and `Z`. This is our "sample space" over our simulated data. In other words, this 
+```{r}
+joint_probs <- as.data.frame(qY %*% t(qZ))
+rownames(joint_probs) <- c("ZQ1", "ZQ2", "ZQ3", "ZQ4")
+colnames(joint_probs) <- c("YQ1", "YQ2", "YQ3", "YQ4")
+
+N <- sum(joint_probs)
+(joint_probs <- joint_probs / N)
+```
+
+Now we need to calculate the marginal probabilities (in an extra row and column) by summing our rows and then summing our columns, and then dividing our cell values by the sum of our random variable products, to convert our cell values into probabilities.
+
+We can verify that this is a valid marginal probability table by summing the rows and columns of our frequency table
+```{r verification}
+xx <- 0
+yy <- 0
+
+# sum rows to 1
+for (i in 1:nrow(joint_probs)){xx <- xx + sum(joint_probs[i, ])}
+# sum columns to 1
+for (i in 1:nrow(joint_probs)){yy <- yy + sum(joint_probs[, i])}
+
+# Check both sums are equal to 1
+(xx == 1 & yy == 1)
+```

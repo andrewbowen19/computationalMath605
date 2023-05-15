@@ -363,15 +363,6 @@ display: none;
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
-## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
-## ✔ readr   2.1.2      ✔ forcats 0.5.2 
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <div id="problem-1" class="section level2">
 <h2>Problem 1</h2>
 <pre class="r"><code>set.seed(1234)</code></pre>
@@ -483,7 +474,88 @@ random variable <span class="math inline">\(Y\)</span></p>
 <h3>Question 1c</h3>
 <p><span class="math inline">\(P(Z &gt; \lambda | Z &gt; \lambda
 /2)\)</span></p>
-<pre class="r"><code>prob1c &lt;- pgamma(1, shape= lambda / 2)</code></pre>
+<p>We can rewrite this as <span class="math inline">\(P(Z &gt; λ/2 ∩ Z
+&gt; λ) / P(Z &gt; λ/2)\)</span>. In this case, the numerator can be
+rewritten as <span class="math inline">\(P(Z &gt; λ/2 ∩ Z &gt; λ) = P(Z
+&gt; λ)\)</span>. Since wee can treat these as independent, we can
+multiply them separately <span class="math inline">\(P(Z &gt;
+λ/2)\)</span> &amp; <span class="math inline">\(P(Z &gt;
+λ)\)</span>.</p>
+<p>First, let’s find <span class="math inline">\(P(Z &gt;
+λ/2)\)</span>:</p>
+<span class="math display">\[\begin{aligned}
+  P(Z &gt; λ/2) = 1 - P(Z \le \lambda) = 1 - F(\lambda)\newline
+             = 1 - (1 - e^{-λλ}) = e^{-λ}
+\end{aligned}\]</span>
+<p>We can use the cumulative distribution function for the exponential
+distribution <span class="math inline">\(F(x) = 1 - e^{-\lambda
+x}\)</span>.</p>
+<p>Similarly, we can find <span class="math inline">\(P(Z &gt; λ/2) = 1
+- F(λ/2) = 1 - (1 - e^(-λλ/2)) = e^(-λ/2)\)</span>. Dividing these, we
+get <span class="math inline">\(e^{-\lambda / 2}\)</span>. Which we can
+plug in our value fo 8 to find the probability:</p>
+<pre class="r"><code>(prob1c &lt;- exp(-lambda / 2))</code></pre>
+<pre><code>## [1] 0.01831564</code></pre>
+<div id="question-1d" class="section level4">
+<h4>Question 1d</h4>
+<p>Similar to above, we can re-write the expression as <span class="math inline">\(P(Z &gt; 2λ) / P(Z &gt; λ)\)</span>.</p>
+<span class="math display">\[\begin{aligned}
+  P(Z &gt; 2\lambda) = 1 - (1 - e^{-\lambda2\lambda}) = e^{\lambda}
+  P(Z &gt; λ) = 1 - (1 - e^-{\lambda\lambda}) = e^{-\lambda}
+\end{aligned}\]</span>
+<p>These two expressions divided by each other give a probability of 1.
+This makes sense given that Z must be greater than <span class="math inline">\(\lambda\)</span> to be greater than <span class="math inline">\(2\lambda\)</span>.</p>
+</div>
+<div id="question-1e" class="section level4">
+<h4>Question 1e</h4>
+<p><span class="math inline">\(P(Z&gt;3λ | Z&gt; λ)\)</span></p>
+<p>TODO: finish this CDF manipulation</p>
+</div>
+</div>
+<div id="question-2" class="section level3">
+<h3>Question 2</h3>
+<p><em>Loosely investigate whether P(YZ) = P(Y) P(Z) by building a table
+with quartiles and evaluating the marginal and joint probabilities.</em>
+First, let’s get the different quartiles of our simulated values for Y
+and Z</p>
+<pre class="r"><code>quartiles_to_keep &lt;- c(&quot;25%&quot;, &quot;50%&quot;, &quot;75%&quot;, &quot;100%&quot;)
+(qY &lt;- quantile(Y)[quartiles_to_keep])</code></pre>
+<pre><code>##       25%       50%       75%      100% 
+## 0.4262256 0.5848759 0.7794643 2.2111061</code></pre>
+<pre class="r"><code>(qZ &lt;- quantile(Z)[quartiles_to_keep])</code></pre>
+<pre><code>##        25%        50%        75%       100% 
+## 0.03798518 0.08890607 0.17665073 1.05238332</code></pre>
+<p>Now let’s matrix multiply our simulated datasets to get the possible
+pairwise products of <code>Y</code> and <code>Z</code>. This is our
+“sample space” over our simulated data. In other words, this</p>
+<pre class="r"><code>joint_probs &lt;- as.data.frame(qY %*% t(qZ))
+rownames(joint_probs) &lt;- c(&quot;ZQ1&quot;, &quot;ZQ2&quot;, &quot;ZQ3&quot;, &quot;ZQ4&quot;)
+colnames(joint_probs) &lt;- c(&quot;YQ1&quot;, &quot;YQ2&quot;, &quot;YQ3&quot;, &quot;YQ4&quot;)
+
+N &lt;- sum(joint_probs)
+(joint_probs &lt;- joint_probs / N)</code></pre>
+<pre><code>##             YQ1         YQ2        YQ3        YQ4
+## ZQ1 0.002983846 0.006983830 0.01387643 0.08266777
+## ZQ2 0.004094498 0.009583363 0.01904154 0.11343850
+## ZQ3 0.005456739 0.012771750 0.02537666 0.15117951
+## ZQ4 0.015479130 0.036229620 0.07198596 0.42885087</code></pre>
+<p>Now we need to calculate the marginal probabilities (in an extra row
+and column) by summing our rows and then summing our columns, and then
+dividing our cell values by the sum of our random variable products, to
+convert our cell values into probabilities.</p>
+<p>We can verify that this is a valid marginal probability table by
+summing the rows and columns of our frequency table</p>
+<pre class="r"><code>xx &lt;- 0
+yy &lt;- 0
+
+# sum rows to 1
+for (i in 1:nrow(joint_probs)){xx &lt;- xx + sum(joint_probs[i, ])}
+# sum columns to 1
+for (i in 1:nrow(joint_probs)){yy &lt;- yy + sum(joint_probs[, i])}
+
+# Check both sums are equal to 1
+(xx == 1 &amp; yy == 1)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 </div>
 

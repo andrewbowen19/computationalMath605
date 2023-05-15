@@ -182,6 +182,22 @@ Our p-value being less than $\alpha=0.05$ means that we can reject the null hypo
 
 ### Results
 ```{r}
-colnames(test)
+test$SalePrice = predict(mylm, newdata = test)
 ```
 
+Now we can write our predicted values to a csv file 
+```{r}
+# Get DF of only Id and price column for submission
+df <- as.data.frame(test[, c("Id", "SalePrice")])
+
+# impute any missing values for Kaggle as the mean sale price
+x <- mean(df$SalePrice, na.rm=TRUE)
+df[is.na(df$SalePrice), "SalePrice"] <- x
+
+# Write data to csv
+write.csv(df, "submission.csv", row.names=F)
+```
+
+
+
+Test data & predicted values for sale price regression on home purchase datasets. Final Project for CUNY DATA605
