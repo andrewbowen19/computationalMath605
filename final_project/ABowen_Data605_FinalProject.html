@@ -407,15 +407,16 @@ the single exponential (Z) and the sum of exponentials (Y)</p>
 <p>For the gamma distribution, the pdf is</p>
 <span class="math display">\[\begin{aligned}
   f(x; \alpha, \beta) = \frac{x^{\alpha - 1}e^{-\beta
-x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx
+x}\beta^{\alpha}}{\Gamma(\alpha)}
 \end{aligned}\]</span>
 <p>where <span class="math inline">\(\Gamma(\alpha) = (\alpha -
 1)!\)</span>. We can find the expected value:</p>
 <span class="math display">\[\begin{aligned}
-  E(X) = \int_0^{\infty} x \cdot  \frac{x^{\alpha - 1}e^{-\beta
-x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx
-\end{aligned}\newline\]</span>
-<p>= _0^{} x^{(+ 1) - 1}e^{-x} ,dx \end{aligned}</p>
+  E(X) = \int_0^{\infty} x \cdot \frac{x^{\alpha - 1}e^{-\beta
+x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx\newline
+       = \int_0^{\infty} \frac{\alpha}{\beta}\frac{\beta^{\alpha +
+1}}{\Gamma(\alpha + 1)}x^{(\alpha + 1) - 1}e^{-\beta x} \,dx
+\end{aligned}\]</span>
 <p>We got to the step above using the fact that <span class="math inline">\(\Gamma(a + 1) = a\Gamma(a)\)</span>. W ecan pull
 out our constants above and are left with the definition of the gamma
 distribution, which integrates to 1 over <span class="math inline">\((o,
@@ -424,6 +425,30 @@ distribution, which integrates to 1 over <span class="math inline">\((o,
   E(X) = \frac{\alpha}{\beta}\int_0^{\infty} \frac{\beta^{\alpha +
 1}}{\Gamma(\alpha + 1)}x^{(\alpha + 1) - 1}e^{-\beta x} \,dx
        = \frac{\alpha}{\beta}
+\end{aligned}\]</span>
+<p>For the variance of the gamma distribution, we can use our
+calculation above, plugging into the formula <span class="math inline">\(var(X) = E(X^2) - (E(X))^2\)</span></p>
+<span class="math display">\[\begin{aligned}
+  var(X) = \int_0^{\infty} x^2 f_X(x) \,dx - (E(X))^2\newline
+         = \int_0^{\infty} x^2 \frac{x^{\alpha - 1}e^{-\beta
+x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx -
+\frac{\alpha^2}{\beta^2}\newline
+         =
+\frac{\beta^{\alpha}}{\Gamma(\alpha)}\int_0^{\infty}(\frac{t}{\beta})^{\alpha
++ 1}e^{-t}/\beta \,dt - \frac{\alpha^2}{\beta^2}
+\end{aligned}\]</span>
+Where we substituted <span class="math inline">\(t = -\beta e\)</span>.
+Now we can simplify
+<span class="math display">\[\begin{aligned}
+  var(X) = \frac{\beta^{\alpha}}{\beta^{\alpha +
+2}\Gamma(\alpha)}\int_0^{\infty} t^{\alpha + 1}e^t \,dt -
+\frac{\alpha^2}{\beta^2} \newline
+         = \frac{\Gamma(\alpha + 2)}{\beta^2\Gamma(\alpha)} -
+\frac{\alpha^2}{\beta^2}\newline
+         = \frac{\alpha(\alpha + 1)\Gamma(\alpha) -
+\alpha^2\Gamma(\alpha)}{\beta^2\Gamma(\alpha])}\newline
+         = \frac{\alpha(\alpha + 1 - \alpha1)}{\beta^2} =
+\frac{\alpha}{\beta^2}
 \end{aligned}\]</span>
 </div>
 <div id="moment-generating-function-for-exponentials" class="section level4">
@@ -444,24 +469,25 @@ expect from our simulated data (<span class="math inline">\(1/8 =
 0.125\)</span>)</p>
 <pre class="r"><code>mean(Z)</code></pre>
 <pre><code>## [1] 0.1261022</code></pre>
-<p>For the sum of exponentials (an <a href="https://en.wikipedia.org/wiki/Erlang_distribution">Eralng
+<p>For the sum of exponentials (an <a href="https://en.wikipedia.org/wiki/Erlang_distribution">Erlang
 Distribution</a>), we first need to figure out the moment generating
 function for the sum of exponentially-distributed random variables. We
 can use the property of moment generating functions that the sum of
 independent random variables produces a <em>product</em> moment
 generating function of the input variables <span class="math inline">\(M_{X + Y}(t) = M_X(t)M_Y(t)\)</span></p>
 <span class="math display">\[\begin{aligned}
-  M_Y(t) = (\frac{1}{1 - \frac{t}{\lambda}})^n
+  M_Y(t) = (\frac{1}{1 - \frac{t}{\lambda}})^n = (1 -
+\frac{t}{\lambda})^{-n}
 \end{aligned}\]</span>
 <p>We can take the first derivative of this expression w.r.t <span class="math inline">\(t\)</span> and then evaluate at <span class="math inline">\(t=0\)</span> to find the expected value for our
 random variable <span class="math inline">\(Y\)</span></p>
 <span class="math display">\[\begin{aligned}
-  M_Y(t)\rvert_{t=0} = \frac{d}{\,dt} (\frac{1}{1 -
-\frac{t}{\lambda}})^n\rvert_{t=0} \newline
-                     = n(\frac{1}{1 -
-\frac{t}{\lambda}})(\frac{-1}{\lambda})\frac{-1}{1 - \frac{t}{\lambda}}
-\rvert_{t=0}\newline
-                     = n(1)\frac{1}{\lambda}(1) = \frac{n}{\lambda}
+  M_Y(t)\rvert_{t=0} = \frac{d}{\,dt} = (1 -
+\frac{t}{\lambda})^{-n}\rvert_{t=0} \newline
+                     = -n(\frac{1}{1 - \frac{t}{\lambda}})^{-n -
+1}(\frac{-1}{\lambda})\rvert_{t=0} = \frac{n}{\lambda(1 -
+\frac{t}{\lambda})^{n + 1}}\rvert_{t=0}\newline
+                     \frac{n}{\lambda}
 \end{aligned}\]</span>
 <p>This predicted value is pretty close to our simulated data mean</p>
 <pre class="r"><code>print(n / lambda)</code></pre>
@@ -474,42 +500,60 @@ random variable <span class="math inline">\(Y\)</span></p>
 <h3>Question 1c</h3>
 <p><span class="math inline">\(P(Z &gt; \lambda | Z &gt; \lambda
 /2)\)</span></p>
-<p>We can rewrite this as <span class="math inline">\(P(Z &gt; λ/2 ∩ Z
-&gt; λ) / P(Z &gt; λ/2)\)</span>. In this case, the numerator can be
-rewritten as <span class="math inline">\(P(Z &gt; λ/2 ∩ Z &gt; λ) = P(Z
-&gt; λ)\)</span>. Since wee can treat these as independent, we can
-multiply them separately <span class="math inline">\(P(Z &gt;
-λ/2)\)</span> &amp; <span class="math inline">\(P(Z &gt;
-λ)\)</span>.</p>
+<p>We can rewrite this as <span class="math inline">\(P(Z &gt; \lambda/2
+∩ Z &gt; \lambda) / P(Z &gt; \lambda/2)\)</span>. In this case, the
+numerator can be rewritten as <span class="math inline">\(P(Z &gt;
+\lambda/2 ∩ Z &gt; \lambda) = P(Z &gt; \lambda)\)</span>.We can then
+calculate our numerator and denominator expressions separately <span class="math inline">\(P(Z &gt; \lambda/2)\)</span> &amp; <span class="math inline">\(P(Z &gt; \lambda)\)</span>.</p>
 <p>First, let’s find <span class="math inline">\(P(Z &gt;
-λ/2)\)</span>:</p>
+\lambda)\)</span>:</p>
 <span class="math display">\[\begin{aligned}
-  P(Z &gt; λ/2) = 1 - P(Z \le \lambda) = 1 - F(\lambda)\newline
-             = 1 - (1 - e^{-λλ}) = e^{-λ}
+  P(Z &gt; \lambda) = 1 - P(Z \le \lambda) = 1 - F(\lambda)\newline
+             = 1 - (1 - e^{-\lambda\lambda}) = e^{-\lambda}
 \end{aligned}\]</span>
 <p>We can use the cumulative distribution function for the exponential
 distribution <span class="math inline">\(F(x) = 1 - e^{-\lambda
 x}\)</span>.</p>
-<p>Similarly, we can find <span class="math inline">\(P(Z &gt; λ/2) = 1
-- F(λ/2) = 1 - (1 - e^(-λλ/2)) = e^(-λ/2)\)</span>. Dividing these, we
-get <span class="math inline">\(e^{-\lambda / 2}\)</span>. Which we can
-plug in our value fo 8 to find the probability:</p>
+<p>Similarly, we can find <span class="math inline">\(P(Z &gt;
+\lambda/2) = 1 - F(\lambda/2) = 1 - (1 - e^{-\lambda\lambda/2}) =
+e^{-\lambda/2}\)</span>. Dividing these, we get <span class="math inline">\(e^{-\lambda / 2}\)</span>. Which we can plug in
+our value fo 8 to find the probability:</p>
 <pre class="r"><code>(prob1c &lt;- exp(-lambda / 2))</code></pre>
 <pre><code>## [1] 0.01831564</code></pre>
 <div id="question-1d" class="section level4">
 <h4>Question 1d</h4>
-<p>Similar to above, we can re-write the expression as <span class="math inline">\(P(Z &gt; 2λ) / P(Z &gt; λ)\)</span>.</p>
+<p>Similar to above, we can re-write the expression as <span class="math inline">\(P(Z &gt; 2\lambda) / P(Z &gt;
+\lambda)\)</span>.</p>
 <span class="math display">\[\begin{aligned}
   P(Z &gt; 2\lambda) = 1 - (1 - e^{-\lambda2\lambda}) = e^{\lambda}
-  P(Z &gt; λ) = 1 - (1 - e^-{\lambda\lambda}) = e^{-\lambda}
+  P(Z &gt; \lambda) = 1 - (1 - e^-{\lambda\lambda}) = e^{-\lambda}
 \end{aligned}\]</span>
 <p>These two expressions divided by each other give a probability of 1.
 This makes sense given that Z must be greater than <span class="math inline">\(\lambda\)</span> to be greater than <span class="math inline">\(2\lambda\)</span>.</p>
 </div>
 <div id="question-1e" class="section level4">
 <h4>Question 1e</h4>
-<p><span class="math inline">\(P(Z&gt;3λ | Z&gt; λ)\)</span></p>
-<p>TODO: finish this CDF manipulation</p>
+<p><span class="math inline">\(P(Z&gt;3\lambda | Z&gt;
+\lambda)\)</span></p>
+<p>Similar to above, we can rewrite this expression:</p>
+<span class="math display">\[\begin{aligned}
+  P(Z&gt;3\lambda | Z&gt; \lambda) = \frac{P(Z &gt; \lambda \cap Z &gt;
+3\lambda)}{P(Z &gt; \lambda)}\newline
+                = \frac{P(Z &gt; 3\lambda)}{P(Z &gt; \lambda)}
+\end{aligned}\]</span>
+<p>We already know from above that <span class="math inline">\(P(Z &gt;
+\lambda) = e^{-\lambda}\)</span>. We can then evaluate the numerator
+<span class="math inline">\(P(Z &gt; 3\lambda)\)</span></p>
+<span class="math display">\[\begin{aligned}
+  P(Z &gt; 3\lambda) = 1 - (1 - e ^{-3\lambda}) = e^{-3\lambda}
+\end{aligned}\]</span>
+Plugging into our joint probability, we get
+<span class="math display">\[\begin{aligned}
+  P(Z&gt;3\lambda | Z&gt; \lambda) = \frac{e^{-3\lambda}}{e^{-\lambda}}
+= e^{-2\lambda}
+\end{aligned}\]</span>
+<pre class="r"><code>(prob1e &lt;- exp(-2 * lambda))</code></pre>
+<pre><code>## [1] 1.125352e-07</code></pre>
 </div>
 </div>
 <div id="question-2" class="section level3">
@@ -527,13 +571,14 @@ and Z</p>
 ## 0.03798518 0.08890607 0.17665073 1.05238332</code></pre>
 <p>Now let’s matrix multiply our simulated datasets to get the possible
 pairwise products of <code>Y</code> and <code>Z</code>. This is our
-“sample space” over our simulated data. In other words, this</p>
-<pre class="r"><code>joint_probs &lt;- as.data.frame(qY %*% t(qZ))
-rownames(joint_probs) &lt;- c(&quot;ZQ1&quot;, &quot;ZQ2&quot;, &quot;ZQ3&quot;, &quot;ZQ4&quot;)
-colnames(joint_probs) &lt;- c(&quot;YQ1&quot;, &quot;YQ2&quot;, &quot;YQ3&quot;, &quot;YQ4&quot;)
+“sample space” over our simulated data. In other words, this gives us
+bins into whihc out outcomes could fall into</p>
+<pre class="r"><code>counts &lt;- as.data.frame(qY %*% t(qZ))
+rownames(counts) &lt;- c(&quot;ZQ1&quot;, &quot;ZQ2&quot;, &quot;ZQ3&quot;, &quot;ZQ4&quot;)
+colnames(counts) &lt;- c(&quot;YQ1&quot;, &quot;YQ2&quot;, &quot;YQ3&quot;, &quot;YQ4&quot;)
 
-N &lt;- sum(joint_probs)
-(joint_probs &lt;- joint_probs / N)</code></pre>
+N &lt;- sum(counts)
+(joint_probs &lt;- counts / N)</code></pre>
 <pre><code>##             YQ1         YQ2        YQ3        YQ4
 ## ZQ1 0.002983846 0.006983830 0.01387643 0.08266777
 ## ZQ2 0.004094498 0.009583363 0.01904154 0.11343850
@@ -556,6 +601,41 @@ for (i in 1:nrow(joint_probs)){yy &lt;- yy + sum(joint_probs[, i])}
 # Check both sums are equal to 1
 (xx == 1 &amp; yy == 1)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
+</div>
+<div id="independence" class="section level3">
+<h3>Independence</h3>
+<p>First, let’s run a <span class="math inline">\(\chi^2\)</span> test
+for independence. We can use our <code>counts</code> table, which gives
+us the frequency of observatiosn in each quartile.</p>
+<pre class="r"><code>chisq.test(counts)</code></pre>
+<pre><code>## Warning in chisq.test(counts): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  counts
+## X-squared = 7.7341e-32, df = 9, p-value = 1</code></pre>
+<p>Our p-value of 1 indicates that there is no relationship between
+<span class="math inline">\(Y\)</span> and <span class="math inline">\(Z\)</span>(i.e., they <strong>are</strong>
+independent), and we cannot reject the null. This makes sense as
+<code>Y</code> and <code>Z</code> were simulated from different
+distribution calls in our code, and should be independent random
+vars.</p>
+<p>Now we can run <a href="https://statsandr.com/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/">Fisher’s
+exact test for independence</a>, which is used typically with smaller
+samples</p>
+<pre class="r"><code>ftest &lt;- fisher.test(counts)</code></pre>
+<pre><code>## Warning in fisher.test(counts): &#39;x&#39; has been rounded to integer: Mean relative
+## difference: 0.470764</code></pre>
+<pre class="r"><code>ftest</code></pre>
+<pre><code>## 
+##  Fisher&#39;s Exact Test for Count Data
+## 
+## data:  counts
+## p-value = 1
+## alternative hypothesis: two.sided</code></pre>
+<p>Similar to above, a p-value of 1 indicates we <strong>cannot</strong>
+reject the null hypothesis that our random variables are
+independent.</p>
 </div>
 </div>
 

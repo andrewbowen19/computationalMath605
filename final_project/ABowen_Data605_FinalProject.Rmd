@@ -60,14 +60,13 @@ Using calculus, calculate the expected value and variance of the Gamma pdf ($X$)
 For the gamma distribution, the pdf is 
 
 \begin{aligned}
-  f(x; \alpha, \beta) = \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx
+  f(x; \alpha, \beta) = \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)}
 \end{aligned}
 
 where $\Gamma(\alpha) = (\alpha - 1)!$. We can find the expected value:
 
 \begin{aligned}
-  E(X) = \int_0^{\infty} x \cdot  \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx
-\end{aligned}\newline
+  E(X) = \int_0^{\infty} x \cdot \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx\newline
        = \int_0^{\infty} \frac{\alpha}{\beta}\frac{\beta^{\alpha + 1}}{\Gamma(\alpha + 1)}x^{(\alpha + 1) - 1}e^{-\beta x} \,dx
 \end{aligned}
 
@@ -78,6 +77,21 @@ We got to the step above using the fact that $\Gamma(a + 1) = a\Gamma(a)$. W eca
        = \frac{\alpha}{\beta}
 \end{aligned}
 
+For the variance of the gamma distribution, we can use our calculation above, plugging into the formula $var(X) = E(X^2) - (E(X))^2$
+
+\begin{aligned}
+  var(X) = \int_0^{\infty} x^2 f_X(x) \,dx - (E(X))^2\newline
+         = \int_0^{\infty} x^2 \frac{x^{\alpha - 1}e^{-\beta x}\beta^{\alpha}}{\Gamma(\alpha)} \,dx - \frac{\alpha^2}{\beta^2}\newline
+         = \frac{\beta^{\alpha}}{\Gamma(\alpha)}\int_0^{\infty}(\frac{t}{\beta})^{\alpha + 1}e^{-t}/\beta \,dt - \frac{\alpha^2}{\beta^2} 
+\end{aligned}
+
+Where we substituted $t = -\beta e$. Now we can simplify
+\begin{aligned}
+  var(X) = \frac{\beta^{\alpha}}{\beta^{\alpha + 2}\Gamma(\alpha)}\int_0^{\infty} t^{\alpha + 1}e^t \,dt - \frac{\alpha^2}{\beta^2} \newline
+         = \frac{\Gamma(\alpha + 2)}{\beta^2\Gamma(\alpha)} - \frac{\alpha^2}{\beta^2}\newline
+         = \frac{\alpha(\alpha + 1)\Gamma(\alpha) - \alpha^2\Gamma(\alpha)}{\beta^2\Gamma(\alpha])}\newline
+         = \frac{\alpha(\alpha + 1 - \alpha1)}{\beta^2} = \frac{\alpha}{\beta^2}
+\end{aligned}
 #### Moment-generating function for exponentials
 Let's define our moment-generating function for the exponential distribution:
 
@@ -95,20 +109,18 @@ When we evaluate the above at $t=0$, we get $1/\lambda$, roughly in line with wh
 mean(Z)
 ```
 
-For the sum of exponentials (an [Eralng Distribution](https://en.wikipedia.org/wiki/Erlang_distribution)), we first need to figure out the moment generating function for the sum of exponentially-distributed random variables. We can use the property of moment generating functions that the sum of independent random variables produces a *product* moment generating function of the input variables $M_{X + Y}(t) = M_X(t)M_Y(t)$
-
-
+For the sum of exponentials (an [Erlang Distribution](https://en.wikipedia.org/wiki/Erlang_distribution)), we first need to figure out the moment generating function for the sum of exponentially-distributed random variables. We can use the property of moment generating functions that the sum of independent random variables produces a *product* moment generating function of the input variables $M_{X + Y}(t) = M_X(t)M_Y(t)$
 
 \begin{aligned}
-  M_Y(t) = (\frac{1}{1 - \frac{t}{\lambda}})^n
+  M_Y(t) = (\frac{1}{1 - \frac{t}{\lambda}})^n = (1 - \frac{t}{\lambda})^{-n}
 \end{aligned}
 
 We can take the first derivative of this expression w.r.t $t$ and then evaluate at $t=0$ to find the expected value for our random variable $Y$
 
 \begin{aligned}
-  M_Y(t)\rvert_{t=0} = \frac{d}{\,dt} (\frac{1}{1 - \frac{t}{\lambda}})^n\rvert_{t=0} \newline
-                     = n(\frac{1}{1 - \frac{t}{\lambda}})(\frac{-1}{\lambda})\frac{-1}{1 - \frac{t}{\lambda}} \rvert_{t=0}\newline
-                     = n(1)\frac{1}{\lambda}(1) = \frac{n}{\lambda} 
+  M_Y(t)\rvert_{t=0} = \frac{d}{\,dt} = (1 - \frac{t}{\lambda})^{-n}\rvert_{t=0} \newline
+                     = -n(\frac{1}{1 - \frac{t}{\lambda}})^{-n - 1}(\frac{-1}{\lambda})\rvert_{t=0} = \frac{n}{\lambda(1 - \frac{t}{\lambda})^{n + 1}}\rvert_{t=0}\newline
+                     \frac{n}{\lambda} 
 \end{aligned}
 This predicted value is pretty close to our simulated data mean
 ```{r}
@@ -120,38 +132,57 @@ print(mean(Y))
 ### Question 1c
 $P(Z > \lambda | Z > \lambda /2)$
 
-We can rewrite this as $P(Z > λ/2 ∩ Z > λ) / P(Z > λ/2)$. In this case, the numerator can be rewritten as $P(Z > λ/2 ∩ Z > λ) = P(Z > λ)$. Since wee can treat these as independent, we can multiply them separately $P(Z > λ/2)$ & $P(Z > λ)$. 
+We can rewrite this as $P(Z > \lambda/2 ∩ Z > \lambda) / P(Z > \lambda/2)$. In this case, the numerator can be rewritten as $P(Z > \lambda/2 ∩ Z > \lambda) = P(Z > \lambda)$.We can then calculate our numerator and denominator expressions separately $P(Z > \lambda/2)$ & $P(Z > \lambda)$. 
 
-First, let's find $P(Z > λ/2)$:
+First, let's find $P(Z > \lambda)$:
 
 \begin{aligned}
-  P(Z > λ/2) = 1 - P(Z \le \lambda) = 1 - F(\lambda)\newline
-             = 1 - (1 - e^{-λλ}) = e^{-λ}
+  P(Z > \lambda) = 1 - P(Z \le \lambda) = 1 - F(\lambda)\newline
+             = 1 - (1 - e^{-\lambda\lambda}) = e^{-\lambda}
 \end{aligned}
 
 We can use the cumulative distribution function for the exponential distribution $F(x) = 1 - e^{-\lambda x}$.
 
-Similarly, we can find $P(Z > λ/2) = 1 - F(λ/2) = 1 - (1 - e^(-λλ/2)) = e^(-λ/2)$. Dividing these, we get $e^{-\lambda / 2}$. Which we can plug in our value fo 8 to find the probability:
+Similarly, we can find $P(Z > \lambda/2) = 1 - F(\lambda/2) = 1 - (1 - e^{-\lambda\lambda/2}) = e^{-\lambda/2}$. Dividing these, we get $e^{-\lambda / 2}$. Which we can plug in our value fo 8 to find the probability:
 ```{r}
 (prob1c <- exp(-lambda / 2))
 ```
 
 
 #### Question 1d
-Similar to above, we can re-write the expression as $P(Z > 2λ) / P(Z > λ)$.
+Similar to above, we can re-write the expression as $P(Z > 2\lambda) / P(Z > \lambda)$.
 
 \begin{aligned}
   P(Z > 2\lambda) = 1 - (1 - e^{-\lambda2\lambda}) = e^{\lambda}
-  P(Z > λ) = 1 - (1 - e^-{\lambda\lambda}) = e^{-\lambda}
+  P(Z > \lambda) = 1 - (1 - e^-{\lambda\lambda}) = e^{-\lambda}
 \end{aligned}
 
 These two expressions divided by each other give a probability of 1. This makes sense given that Z must be greater than $\lambda$ to be greater than $2\lambda$.
 
 #### Question 1e
-$P(Z>3λ | Z> λ)$
+$P(Z>3\lambda | Z> \lambda)$
 
-TODO: finish this CDF manipulation
+Similar to above, we can rewrite this expression:
 
+\begin{aligned}
+  P(Z>3\lambda | Z> \lambda) = \frac{P(Z > \lambda \cap Z > 3\lambda)}{P(Z > \lambda)}\newline
+                = \frac{P(Z > 3\lambda)}{P(Z > \lambda)}
+\end{aligned}
+
+We already know from above that $P(Z > \lambda) = e^{-\lambda}$. We can then evaluate the numerator $P(Z > 3\lambda)$
+
+\begin{aligned}
+  P(Z > 3\lambda) = 1 - (1 - e ^{-3\lambda}) = e^{-3\lambda}
+\end{aligned}
+
+Plugging into our joint probability, we get
+\begin{aligned}
+  P(Z>3\lambda | Z> \lambda) = \frac{e^{-3\lambda}}{e^{-\lambda}} = e^{-2\lambda}
+\end{aligned}
+
+```{r}
+(prob1e <- exp(-2 * lambda))
+```
 
 ### Question 2
 *Loosely investigate whether P(YZ) = P(Y) P(Z) by building a table with quartiles and evaluating the marginal and joint probabilities.*
@@ -167,14 +198,14 @@ quartiles_to_keep <- c("25%", "50%", "75%", "100%")
 
 ```
 
-Now let's matrix multiply our simulated datasets to get the possible pairwise products of `Y` and `Z`. This is our "sample space" over our simulated data. In other words, this 
+Now let's matrix multiply our simulated datasets to get the possible pairwise products of `Y` and `Z`. This is our "sample space" over our simulated data. In other words, this gives us bins into whihc out outcomes could fall into
 ```{r}
-joint_probs <- as.data.frame(qY %*% t(qZ))
-rownames(joint_probs) <- c("ZQ1", "ZQ2", "ZQ3", "ZQ4")
-colnames(joint_probs) <- c("YQ1", "YQ2", "YQ3", "YQ4")
+counts <- as.data.frame(qY %*% t(qZ))
+rownames(counts) <- c("ZQ1", "ZQ2", "ZQ3", "ZQ4")
+colnames(counts) <- c("YQ1", "YQ2", "YQ3", "YQ4")
 
-N <- sum(joint_probs)
-(joint_probs <- joint_probs / N)
+N <- sum(counts)
+(joint_probs <- counts / N)
 ```
 
 Now we need to calculate the marginal probabilities (in an extra row and column) by summing our rows and then summing our columns, and then dividing our cell values by the sum of our random variable products, to convert our cell values into probabilities.
@@ -192,3 +223,21 @@ for (i in 1:nrow(joint_probs)){yy <- yy + sum(joint_probs[, i])}
 # Check both sums are equal to 1
 (xx == 1 & yy == 1)
 ```
+
+
+### Independence
+First, let's run a $\chi^2$ test for independence. We can use our `counts` table, which gives us the frequency of observatiosn in each quartile. 
+```{r}
+chisq.test(counts)
+```
+Our p-value of 1 indicates that there is no relationship between $Y$ and $Z$(i.e., they **are** independent), and we cannot reject the null. This makes sense as `Y` and `Z` were simulated from different distribution calls in our code, and should be independent random vars.
+
+Now we can run [Fisher's exact test for independence](https://statsandr.com/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/), which is used typically with smaller samples
+```{r}
+ftest <- fisher.test(counts)
+ftest
+```
+Similar to above, a p-value of 1 indicates we **cannot** reject the null hypothesis that our random variables are independent.
+
+
+

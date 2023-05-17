@@ -109,7 +109,6 @@ randValues <- as.data.frame(dat, col.names=character(1))
 
 hist(randValues[,1], col=rgb(0,0,1,0.5))
 hist(df$MasVnrArea, add=TRUE, col=rgb(1,0,0,0.5))
-
 ```
 
 These both look to be skew-right with similar shapes (although the Kaggle data has a bit longer tail). Overall, these historgrams are similarly shaped and likely would have been pulled from the same distribution
@@ -121,8 +120,7 @@ p5 <- pexp(0.05, rate=lambda)
 p95 <- pexp(0.95, rate=lambda)
 ```
 
-Let's now [construct a 95% confidence interval](https://www.r-bloggers.com/2021/11/calculate-confidence-intervals-in-r/) from our Kaggle variable `MasVnrArea`. To do this we'll need our sample mean and standard deviation
-
+Let's now [construct a 95% confidence interval](https://www.r-bloggers.com/2021/11/calculate-confidence-intervals-in-r/) from our Kaggle variable `MasVnrArea`. To do this we'll need our sample mean and standard deviation for this field
 ```{r conf-interval}
 n <- length(df$MasVnrArea)
 mu <- mean(df$MasVnrArea)
@@ -136,12 +134,10 @@ print(lower_interval)
 print(upper_interval)
 ```
 
-Getting 5th and 95th percentile
+Getting 5th and 95th percentile of our `MasVnrArea` variable
 ```{r}
 quantile(df$MasVnrArea, c(0.05, 0.95))
 ```
-
-
 
 ### Modeling
 
@@ -179,13 +175,12 @@ bptest(mylm)
 ```
 Our p-value being less than $\alpha=0.05$ means that we can reject the null hypothesis and claim that our variables meet the criterion of homoscedasticity.
 
-
 ### Results
 ```{r}
 test$SalePrice = predict(mylm, newdata = test)
 ```
 
-Now we can write our predicted values to a csv file 
+Now we can write our predicted values to a csv file for Kaggle submission
 ```{r}
 # Get DF of only Id and price column for submission
 df <- as.data.frame(test[, c("Id", "SalePrice")])
@@ -198,6 +193,3 @@ df[is.na(df$SalePrice), "SalePrice"] <- x
 write.csv(df, "submission.csv", row.names=F)
 ```
 
-
-
-Test data & predicted values for sale price regression on home purchase datasets. Final Project for CUNY DATA605
